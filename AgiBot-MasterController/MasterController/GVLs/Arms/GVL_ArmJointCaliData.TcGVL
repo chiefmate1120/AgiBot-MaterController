@@ -16,7 +16,7 @@ VAR_GLOBAL CONSTANT
 	
 	// absolute encoder value at calibrated positon
 	g_caliLinkEncoder :ARRAY[1..g_mArmNum, 1..g_mJntNum] OF DINT :=
-		[2383568, 16504180, 1064304, 2073472, 6104944, 9016224, 13420592,
+		[2383568, 16504180, 1109844, 1776208, 6104944, 9165904, 13420592,
 		 14507208, 2154776, 14028284, 15460608, 3197104, 7324448, 14964448];
 	
 	 // if absolute encoder value cross zeros within joint motion range
