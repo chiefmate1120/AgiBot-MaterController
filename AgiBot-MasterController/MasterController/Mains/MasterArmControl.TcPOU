@@ -203,8 +203,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[//TODO
-//slave arm self check status
+        <ST><![CDATA[//slave arm self check status
 IF m_masterInputDataPool.m_slaveStatus.m_armState[1] = SlaveArmState_SelfCheck OR m_masterInputDataPool.m_slaveStatus.m_armState[2] = SlaveArmState_SelfCheck OR 
 			m_masterInputDataPool.m_slaveStatus.m_armState[3] = SlaveArmState_SelfCheck OR m_masterInputDataPool.m_slaveStatus.m_armState[4] = SlaveArmState_SelfCheck THEN
 	GVL_interactUI.g_slaveCheckStatus := 1;
@@ -226,7 +225,7 @@ IF m_masterInputDataPool.m_cartStatus.m_armSwitch THEN
 	GVL_interactUI.g_armSwitchEnable := 1;
 END_IF
 
-GVL_interactUI.g_plcVersion := '1(1.0.0.1)';]]></ST>
+GVL_interactUI.g_plcVersion := '2(1.0.0.1)';]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="MasterArmControl">
@@ -271,7 +270,7 @@ GVL_interactUI.g_plcVersion := '1(1.0.0.1)';]]></ST>
       <LineId Id="17" Count="0" />
     </LineIds>
     <LineIds Name="MasterArmControl.UIOutputProcess">
-      <LineId Id="24" Count="22" />
+      <LineId Id="25" Count="21" />
       <LineId Id="19" Count="0" />
     </LineIds>
   </POU>
