@@ -3,6 +3,8 @@
   <GVL Name="GVL_SystemParameters" Id="{6ebbff17-e303-4344-870e-d2871229e24f}">
     <Declaration><![CDATA[VAR_GLOBAL CONSTANT
 	
+	g_SWVersion : STRING := '2(1.0.0.1)';
+	
 	g_mArmNum :INT := 2;	
 	g_mJntNum :INT := 7;	
 	g_sArmNum :INT := 4;	

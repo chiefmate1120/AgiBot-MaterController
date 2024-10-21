@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
   <GVL Name="GVL_interactUI" Id="{b6fc928c-802a-4bca-a5ad-5de470837f32}">
     <Declaration><![CDATA[{attribute 'qualified_only'}
 VAR_GLOBAL
@@ -55,7 +55,7 @@ VAR_GLOBAL
 	g_masterSelfCheckFinshed : BOOL; 
 		
 	//PLC version information
-	g_plcVersion : STRING;
+	g_plcVersion : STRING := g_SWVersion;
 
 	//stop button ui  : 0 master stop 			
 	g_masterStopButton : UINT:=1;
