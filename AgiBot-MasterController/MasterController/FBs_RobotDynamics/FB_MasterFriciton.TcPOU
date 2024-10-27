@@ -8,7 +8,7 @@ VAR_OUTPUT
 END_VAR
 VAR
 	// joint friction compensation scale
-	m_frictionCompScale :Vec7d :=[0, 0, 0, 0, 0.8, 0.4, 0];
+	m_frictionCompScale :Vec7d :=[0.7, 0.5, 0.5, 0.0, 0.7, 0.7, 0.7];
 	
 	// joint velocity threshold for coulomb friction transition
 	m_cFrictionVelThres : LREAL := 5.0 * g_deg2Rad;
@@ -37,6 +37,10 @@ END_VAR
 VAR_INPUT
 	i_armIdx :INT;
 END_VAR
+
+VAR
+	i:int;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[m_armIdx := i_armIdx;
@@ -46,10 +50,11 @@ m_frictionParamB := g_zeroVec7d;
 m_jntDamp := g_zeroVec7d;
 m_maxFriction := GVL_ArmDynamics.g_maxJntFriction;
 
-m_frictionParamA[5] := GVL_ArmDynamics.g_jntFrictionParam[m_armIdx, 1];
-m_frictionParamB[5] := GVL_ArmDynamics.g_jntFrictionParam[m_armIdx, 2];
-m_frictionParamA[6] := GVL_ArmDynamics.g_jntFrictionParam[m_armIdx, 3];
-m_frictionParamB[6] := GVL_ArmDynamics.g_jntFrictionParam[m_armIdx, 4];]]></ST>
+FOR i:=1 TO 7 DO
+	m_frictionParamA[i] := GVL_ArmDynamics.g_jntFrictionParam[m_armIdx, 2*i-1];
+	m_frictionParamB[i] := GVL_ArmDynamics.g_jntFrictionParam[m_armIdx, 2*i];
+END_FOR
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="run" Id="{0e064868-95f9-4591-a903-e34a876d9e26}">
@@ -84,23 +89,12 @@ END_FOR]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterFriciton.init">
-      <LineId Id="11" Count="1" />
-      <LineId Id="6" Count="1" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="16" Count="0" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="8" Count="0" />
-      <LineId Id="14" Count="0" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="15" Count="0" />
+      <LineId Id="49" Count="10" />
+      <LineId Id="21" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterFriciton.run">
-      <LineId Id="5" Count="0" />
-      <LineId Id="23" Count="0" />
-      <LineId Id="20" Count="0" />
-      <LineId Id="24" Count="0" />
-      <LineId Id="26" Count="3" />
-      <LineId Id="21" Count="0" />
+      <LineId Id="60" Count="7" />
+      <LineId Id="45" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

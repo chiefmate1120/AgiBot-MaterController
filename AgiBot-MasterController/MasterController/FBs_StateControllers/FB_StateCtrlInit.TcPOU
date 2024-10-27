@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
   <POU Name="FB_StateCtrlInit" Id="{2f1b91d8-ebd5-4b63-92d8-450fe3a94973}" SpecialFunc="None">
     <Declaration><![CDATA[// Brief: Master Arm Master Slave Control
 FUNCTION_BLOCK PUBLIC FB_StateCtrlInit EXTENDS FB_MasterArmCtrlBase
@@ -41,26 +41,29 @@ END_VAR
 	RETURN;
 END_IF
 
-CASE m_initState OF
-	0:
-		m_cmdJntPos := i_masterArm.curJntPos;
-		IF i_masterArm.isEnabled(m_jntEnableFlag) = TRUE THEN
-			m_initState :=1;
-		END_IF
-	1: 
-		m_cmdJntPos[7] := m_cmdJntPos[7] + m_jnt7SelfCheckVel * g_armCtrlCycleTime;
-		IF m_cmdJntPos[7]-i_masterArm.curJntPos[7] > m_jnt7LimitErr THEN
-			m_cmdJntPos[7]:=i_masterArm.curJntPos[7];
-			m_jnt7CenterPos :=m_cmdJntPos[7]-m_jnt7HalfMotionRange;
-			m_initState :=2;
-		END_IF
-	2:
-		centerVel :=LIMIT(-m_jnt7SelfCheckVel,(m_jnt7CenterPos-m_cmdJntPos[7])/g_armCtrlCycleTime,m_jnt7SelfCheckVel);
-		m_cmdJntPos[7] := m_cmdJntPos[7] + centerVel * g_armCtrlCycleTime;
-		IF ABS(m_jnt7CenterPos-i_masterArm.curJntPos[7]) < g_jntCtrlAngTolLow THEN
-			m_isFinished :=TRUE;
-		END_IF
-END_CASE
+IF m_timePeriod > 1 THEN
+	m_isFinished :=true;
+END_IF
+//CASE m_initState OF
+//	0:
+//		m_cmdJntPos := i_masterArm.curJntPos;
+//		IF i_masterArm.isEnabled(m_jntEnableFlag) = TRUE THEN
+//			m_initState :=1;
+//		END_IF
+//	1: 
+//		m_cmdJntPos[7] := m_cmdJntPos[7] + m_jnt7SelfCheckVel * g_armCtrlCycleTime;
+//		IF m_cmdJntPos[7]-i_masterArm.curJntPos[7] > m_jnt7LimitErr THEN
+//			m_cmdJntPos[7]:=i_masterArm.curJntPos[7];
+//			m_jnt7CenterPos :=m_cmdJntPos[7]-m_jnt7HalfMotionRange;
+//			m_initState :=2;
+//		END_IF
+//	2:
+//		centerVel :=LIMIT(-m_jnt7SelfCheckVel,(m_jnt7CenterPos-m_cmdJntPos[7])/g_armCtrlCycleTime,m_jnt7SelfCheckVel);
+//		m_cmdJntPos[7] := m_cmdJntPos[7] + centerVel * g_armCtrlCycleTime;
+//		IF ABS(m_jnt7CenterPos-i_masterArm.curJntPos[7]) < g_jntCtrlAngTolLow THEN
+//			m_isFinished :=TRUE;
+//		END_IF
+//END_CASE
 
 ]]></ST>
       </Implementation>
@@ -80,7 +83,10 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[SUPER^.Init(i_masterArm,r_masterArmCtrlCmd);
+m_jntOPMode:=g_allPosMode;
 m_initState :=0;
+
+m_jntOPMode := g_allPosTrqMode;
 ]]></ST>
       </Implementation>
     </Method>
@@ -89,7 +95,10 @@ m_initState :=0;
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_StateCtrlInit.calcCmdJntPos">
-      <LineId Id="43" Count="3" />
+      <LineId Id="43" Count="2" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="62" Count="1" />
       <LineId Id="16" Count="0" />
       <LineId Id="18" Count="0" />
       <LineId Id="20" Count="0" />
@@ -113,7 +122,10 @@ m_initState :=0;
     </LineIds>
     <LineIds Name="FB_StateCtrlInit.init">
       <LineId Id="11" Count="0" />
+      <LineId Id="39" Count="0" />
       <LineId Id="14" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="26" Count="0" />
       <LineId Id="12" Count="0" />
     </LineIds>
   </POU>

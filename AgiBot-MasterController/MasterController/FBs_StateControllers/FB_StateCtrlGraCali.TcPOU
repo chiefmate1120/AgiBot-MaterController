@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_StateCtrlGraCali" Id="{531d8d14-1bd3-4a7e-a3de-2b1adfd1c86b}" SpecialFunc="None">
     <Declaration><![CDATA[// Brief: Master Arm Home Posture
 FUNCTION_BLOCK PUBLIC FB_StateCtrlGraCali EXTENDS FB_MasterArmCtrlBase
@@ -8,33 +8,66 @@ END_VAR
 VAR_OUTPUT
 END_VAR
 VAR CONSTANT
-	m_caliMotionSegs :INT :=6;	
+	m_caliMotionSegs :INT :=18;	
 END_VAR
 VAR
 	// cali trajectory
 	m_leftGraCaliTraj :ARRAY [1..m_caliMotionSegs, 1..g_mJntNum] OF LREAL:=
-		// first calibration traj
-		[0,  -60*g_deg2Rad,    0.0,  -195*g_deg2Rad,  270*g_deg2rad,  -60*g_deg2rad, 0.0 , 
-		 0, -120*g_deg2rad,   0.0,  -165*g_deg2rad,   90*g_deg2rad,  -120*g_deg2rad,  0,
-		 0,  -60*g_deg2Rad,    0.0,  -195*g_deg2Rad,  270*g_deg2rad,  -60*g_deg2rad, 0.0 , 
-		// second calibration traj
-		 0.0,  -75*g_deg2Rad,   30*g_deg2Rad,  -195*g_deg2Rad,  180*g_deg2Rad,  -90*g_deg2Rad,    0,
-		 0.0,  -105*g_deg2Rad,  -30*g_deg2Rad, -165*g_deg2Rad,  180*g_deg2Rad,  -90*g_deg2Rad,     0,
-		0.0,  -75*g_deg2Rad,   30*g_deg2Rad,  -195*g_deg2Rad,  180*g_deg2Rad,  -90*g_deg2Rad,    0];
+		// joint6
+		[0,  -90*g_deg2Rad,    0.0,  -180*g_deg2Rad,  90*g_deg2rad,  -40*g_deg2rad, 0.0 , 
+		 0, -90*g_deg2rad,   0.0,  -180*g_deg2rad,   90*g_deg2rad,  -140*g_deg2rad,  0,
+		 0,  -90*g_deg2Rad,    0.0,  -180*g_deg2Rad,  90*g_deg2rad,  -40*g_deg2rad, 0.0 , 
+		// joint5
+		 0.0,  -90*g_deg2Rad,   0*g_deg2Rad,  -180*g_deg2Rad,  90*g_deg2Rad,  -90*g_deg2Rad,    0,
+		 0.0,  -90*g_deg2Rad,  0*g_deg2Rad, -180*g_deg2Rad,  270*g_deg2Rad,  -90*g_deg2Rad,     0,
+		0.0,  -90*g_deg2Rad,   0*g_deg2Rad,  -180*g_deg2Rad,  90*g_deg2Rad,  -90*g_deg2Rad,    0,
+		// joint4
+		 0.0,  -90*g_deg2Rad,   -30*g_deg2Rad,  -150*g_deg2Rad,  180*g_deg2Rad,  -90*g_deg2Rad,    0,
+		 0.0,  -90*g_deg2Rad,  -30*g_deg2Rad, -210*g_deg2Rad,  180*g_deg2Rad,  -90*g_deg2Rad,     0,
+		0.0,  -90*g_deg2Rad,   -30*g_deg2Rad,  -150*g_deg2Rad,  180*g_deg2Rad,  -90*g_deg2Rad,    0,
+		// joint3
+		 0.0,  -90*g_deg2Rad,   -30*g_deg2Rad,  -180*g_deg2Rad,  180*g_deg2Rad,  -90*g_deg2Rad,    0,
+		 0.0,  -90*g_deg2Rad,  30*g_deg2Rad, -180*g_deg2Rad,  180*g_deg2Rad,  -90*g_deg2Rad,     0,
+		0.0,  -90*g_deg2Rad,   -30*g_deg2Rad,  -180*g_deg2Rad,  180*g_deg2Rad,  -90*g_deg2Rad,    0,
+		// joint2
+		 0.0,  -75*g_deg2Rad,   0*g_deg2Rad,  -180*g_deg2Rad,  180*g_deg2Rad,  -90*g_deg2Rad,    0,
+		 0.0,  -120*g_deg2Rad,  0*g_deg2Rad, -180*g_deg2Rad,  180*g_deg2Rad,  -90*g_deg2Rad,     0,
+		0.0,  -75*g_deg2Rad,   0*g_deg2Rad,  -180*g_deg2Rad,  180*g_deg2Rad,  -90*g_deg2Rad,    0,
+		// joint1/7
+		 0.0*g_deg2Rad,  -90*g_deg2Rad,   0*g_deg2Rad,  -180*g_deg2Rad,  180*g_deg2Rad,  -90*g_deg2Rad,    45*g_deg2Rad,
+		 -30.0*g_deg2Rad,  -90*g_deg2Rad,  0*g_deg2Rad, -180*g_deg2Rad,  180*g_deg2Rad,  -90*g_deg2Rad,     -45*g_deg2Rad,
+		0.0*g_deg2Rad,  -90*g_deg2Rad,   0*g_deg2Rad,  -180*g_deg2Rad,  180*g_deg2Rad,  -90*g_deg2Rad,    45*g_deg2Rad];
 		
 	m_rightGraCaliTraj :ARRAY [1..m_caliMotionSegs, 1..g_mJntNum] OF LREAL:=
-		// first calibration traj
-		[0,   -60*g_deg2Rad,    0.0,   75*g_deg2Rad,   90*g_deg2Rad,   60*g_deg2Rad,  0.0,
-		 0.0,  -120*g_deg2Rad,  0.0,  -75*g_deg2Rad,  270*g_deg2Rad,  120*g_deg2Rad,  0.0,
-		 0,   -60*g_deg2Rad,    0.0,   75*g_deg2Rad,   90*g_deg2Rad,   60*g_deg2Rad,  0.0,
-		// second calibration traj
-		 0.0,  -75*g_deg2Rad,   30*g_deg2Rad,  -15*g_deg2Rad,  180*g_deg2Rad,   90*g_deg2Rad,    0,
-		 0.0, -105*g_deg2Rad,  -30*g_deg2Rad,   15*g_deg2Rad,  180*g_deg2Rad,   90*g_deg2Rad,    0,
-		 0.0,  -75*g_deg2Rad,   30*g_deg2Rad,  -15*g_deg2Rad,  180*g_deg2Rad,   90*g_deg2Rad,    0];
+		// joint6
+		[0,  -90*g_deg2Rad,    0.0,  0*g_deg2Rad,  270*g_deg2rad,  40*g_deg2rad, 0.0 , 
+		 0, -90*g_deg2rad,   0.0,  0*g_deg2rad,   270*g_deg2rad,  140*g_deg2rad,  0,
+		 0,  -90*g_deg2Rad,    0.0,  0*g_deg2Rad,  270*g_deg2rad,  40*g_deg2rad, 0.0 , 
+		// joint5
+		 0.0,  -90*g_deg2Rad,   0*g_deg2Rad,  0*g_deg2Rad,  270*g_deg2Rad,  90*g_deg2Rad,    0,
+		 0.0,  -90*g_deg2Rad,  0*g_deg2Rad, 0*g_deg2Rad,  90*g_deg2Rad,  90*g_deg2Rad,     0,
+		0.0,  -90*g_deg2Rad,   0*g_deg2Rad,  0*g_deg2Rad,  270*g_deg2Rad,  90*g_deg2Rad,    0,
+		// joint4
+		 0.0,  -90*g_deg2Rad,   -30*g_deg2Rad,  30*g_deg2Rad,  180*g_deg2Rad,  90*g_deg2Rad,    0,
+		 0.0,  -90*g_deg2Rad,  -30*g_deg2Rad, -30*g_deg2Rad,  180*g_deg2Rad,  90*g_deg2Rad,     0,
+		0.0,  -90*g_deg2Rad,   -30*g_deg2Rad,  30*g_deg2Rad,  180*g_deg2Rad,  90*g_deg2Rad,    0,
+		// joint3
+		 0.0,  -90*g_deg2Rad,   -30*g_deg2Rad,  0*g_deg2Rad,  180*g_deg2Rad,  90*g_deg2Rad,    0,
+		 0.0,  -90*g_deg2Rad,  30*g_deg2Rad, 0*g_deg2Rad,  180*g_deg2Rad,  90*g_deg2Rad,     0,
+		0.0,  -90*g_deg2Rad,   -30*g_deg2Rad,  0*g_deg2Rad,  180*g_deg2Rad,  90*g_deg2Rad,    0,
+		// joint2
+		 0.0,  -75*g_deg2Rad,   0*g_deg2Rad,  0*g_deg2Rad,  180*g_deg2Rad,  90*g_deg2Rad,    0,
+		 0.0,  -120*g_deg2Rad,  0*g_deg2Rad, 0*g_deg2Rad,  180*g_deg2Rad,  90*g_deg2Rad,     0,
+		0.0,  -75*g_deg2Rad,   0*g_deg2Rad,  0*g_deg2Rad,  180*g_deg2Rad,  90*g_deg2Rad,    0,
+		// joint1/7
+		 0.0*g_deg2Rad,  -90*g_deg2Rad,   0*g_deg2Rad,  0*g_deg2Rad,  180*g_deg2Rad,  90*g_deg2Rad,    45*g_deg2Rad,
+		 30.0*g_deg2Rad,  -90*g_deg2Rad,  0*g_deg2Rad, 0*g_deg2Rad,  180*g_deg2Rad,  90*g_deg2Rad,     -45*g_deg2Rad,
+		0.0*g_deg2Rad,  -90*g_deg2Rad,   0*g_deg2Rad,  0*g_deg2Rad,  180*g_deg2Rad,  90*g_deg2Rad,    45*g_deg2Rad];
+		
 	
 
 	m_transMaxjntVel:Vec7d:=[7(30*g_deg2rad)];
-	m_caliMaxjntVel:Vec7d:=[7(3.0*g_deg2rad)];
+	m_caliMaxjntVel:Vec7d:=[7(5.0*g_deg2rad)];
 	m_caliMaxjntAcc:Vec7d:=[7(1.0)];
 	m_caliMaxjntJerk:Vec7d:=[7(2.0)];
 	
@@ -103,10 +136,11 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[SUPER^.Init(i_masterArm,r_masterArmCtrlCmd);
+
 m_caliTrajIdx :=1;
 
 FOR i:=1 TO m_caliMotionSegs DO
-	IF i=1 OR i = 4 THEN
+	IF (i mod 3) = 1 THEN
 		maxVel := m_transMaxjntVel;
 	ELSE
 		maxVel := m_caliMaxjntVel;
@@ -148,30 +182,9 @@ copyCmds(r_masterArmCtrlCmd);]]></ST>
       <LineId Id="32" Count="0" />
     </LineIds>
     <LineIds Name="FB_StateCtrlGraCali.init">
-      <LineId Id="57" Count="0" />
-      <LineId Id="120" Count="0" />
-      <LineId Id="188" Count="0" />
-      <LineId Id="187" Count="0" />
-      <LineId Id="189" Count="0" />
-      <LineId Id="248" Count="0" />
-      <LineId Id="195" Count="0" />
-      <LineId Id="247" Count="0" />
-      <LineId Id="192" Count="0" />
-      <LineId Id="202" Count="0" />
-      <LineId Id="204" Count="2" />
-      <LineId Id="217" Count="1" />
-      <LineId Id="220" Count="0" />
-      <LineId Id="222" Count="0" />
-      <LineId Id="219" Count="0" />
-      <LineId Id="207" Count="1" />
-      <LineId Id="223" Count="6" />
-      <LineId Id="211" Count="0" />
-      <LineId Id="203" Count="0" />
-      <LineId Id="193" Count="0" />
-      <LineId Id="230" Count="0" />
-      <LineId Id="190" Count="0" />
-      <LineId Id="147" Count="0" />
-      <LineId Id="170" Count="1" />
+      <LineId Id="264" Count="0" />
+      <LineId Id="314" Count="0" />
+      <LineId Id="265" Count="33" />
       <LineId Id="169" Count="0" />
     </LineIds>
   </POU>

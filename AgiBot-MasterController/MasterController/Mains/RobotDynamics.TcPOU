@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="RobotDynamics" Id="{798b314f-0a53-4e08-997d-5fefed426c86}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM RobotDynamics
 
@@ -50,7 +50,7 @@ END_IF
 
 FOR i:=1 TO g_mArmNum DO
 	// run gravity model
-	m_gravityModel[i].run(m_masterJointsData.m_curLinkPos[i], m_masterDynaData.m_gravity[i]);
+	m_gravityModel[i].run(m_masterJointsData.m_curJntPos[i], m_masterDynaData.m_gravity[i]);
 	
 	// run dynamic model
 	m_armDynamic[i].updateDynamic(m_masterJointsData.m_curJntPos[i]);

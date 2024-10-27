@@ -31,7 +31,7 @@ VAR
 	m_firstGripTime :LREAL;
 	
 	// angle threshold indicating gripper open
-	m_openAngThres :LREAL := g_maxGripAngle * 0.5;
+	m_openAngThres :LREAL := 8.0 *g_deg2rad;
 	
 	// angle threshold indicating gripper close
 	m_closeAngThres :LREAL := 2.0 *g_deg2rad;
@@ -41,13 +41,14 @@ END_VAR
       <ST><![CDATA[]]></ST>
     </Implementation>
     <Method Name="gripActionCheck" Id="{f4d967c1-2379-40e6-9da8-88bd04c5294b}">
-      <Declaration><![CDATA[METHOD gripActionCheck : BOOL
+      <Declaration><![CDATA[// 1: finger close, 2: one grip, else 0
+METHOD gripActionCheck : INT
 VAR_INPUT
 	i_gripAngle :LREAL;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[gripActionCheck:=false;
+        <ST><![CDATA[gripActionCheck:=0;
 CASE m_gripperState OF 
 	0:
 		IF i_gripAngle > m_openAngThres THEN
@@ -65,11 +66,12 @@ CASE m_gripperState OF
 			m_gripperState :=1;
 		END_IF
 	3:
+		gripActionCheck := 1;
 		IF i_gripAngle > m_openAngThres THEN
 			m_gripperState :=4;
 		END_IF
 	4:
-		gripActionCheck:=TRUE;
+		gripActionCheck:=2;
 		m_gripperState:=0;
 END_CASE]]></ST>
       </Implementation>
@@ -105,6 +107,10 @@ m_MSCtrlTrigger :=FALSE;]]></ST>
 VAR_INPUT
 	i_gripAngle :LREAL;
 END_VAR
+
+VAR
+	gripState:INT;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF m_MSCtrlTrigger THEN
@@ -114,22 +120,21 @@ END_IF
 
 m_timePeriod := m_timePeriod + m_timeCycle;
 
+gripState := gripActionCheck(i_gripAngle);
 // detect one grip action
-IF gripActionCheck(i_gripAngle) THEN
-	m_gripActionCounts:=m_gripActionCounts+1;
-	
-	// first grip
-	IF 1=m_gripActionCounts THEN
-		m_firstGripTime := m_timePeriod;
-	ELSIF m_gripActionCounts>=2 THEN
-		// second grip and trigger success
-		IF m_timePeriod - m_firstGripTime < m_checkDuration THEN
-			m_MSCtrlTrigger :=TRUE;
-		ELSE
-		// set second grip as new first one
-			m_gripActionCounts:=1;
-			m_firstGripTime:=m_timePeriod;
-		END_IF
+IF  2 = gripState THEN 
+	m_gripActionCounts:=1;
+	m_firstGripTime := m_timePeriod;
+END_IF
+
+// finger close
+IF m_gripActionCounts >=1 AND 1 = gripState THEN
+	IF m_timePeriod - m_firstGripTime < m_checkDuration THEN
+		m_MSCtrlTrigger :=TRUE;
+	ELSE
+	// set second grip as new first one
+		m_gripActionCounts:=0;
+		m_firstGripTime:=m_timePeriod;
 	END_IF
 END_IF
 
@@ -141,21 +146,7 @@ run :=FALSE;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_MSCtrlTriggerCheck.gripActionCheck">
-      <LineId Id="45" Count="0" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="15" Count="2" />
-      <LineId Id="39" Count="0" />
-      <LineId Id="38" Count="0" />
-      <LineId Id="40" Count="2" />
-      <LineId Id="18" Count="0" />
-      <LineId Id="20" Count="1" />
-      <LineId Id="43" Count="1" />
-      <LineId Id="19" Count="0" />
-      <LineId Id="23" Count="2" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="26" Count="0" />
-      <LineId Id="32" Count="1" />
+      <LineId Id="55" Count="24" />
       <LineId Id="14" Count="0" />
     </LineIds>
     <LineIds Name="FB_MSCtrlTriggerCheck.init">
@@ -168,21 +159,7 @@ run :=FALSE;]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_MSCtrlTriggerCheck.run">
-      <LineId Id="26" Count="1" />
-      <LineId Id="29" Count="0" />
-      <LineId Id="28" Count="0" />
-      <LineId Id="30" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="33" Count="0" />
-      <LineId Id="8" Count="0" />
-      <LineId Id="7" Count="0" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="36" Count="11" />
-      <LineId Id="35" Count="0" />
-      <LineId Id="10" Count="0" />
-      <LineId Id="14" Count="0" />
-      <LineId Id="32" Count="0" />
+      <LineId Id="60" Count="25" />
       <LineId Id="31" Count="0" />
     </LineIds>
   </POU>

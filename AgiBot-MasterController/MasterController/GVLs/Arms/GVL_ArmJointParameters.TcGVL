@@ -1,34 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <GVL Name="GVL_ArmJointParameters" Id="{cf487053-15bb-46bd-a4ed-bbb1df690beb}">
     <Declaration><![CDATA[{attribute 'global_init_slot' := '49991'}
 {attribute 'qualified_only'}
 VAR_GLOBAL CONSTANT
 	// encoder resolution
 	g_incEncoderRes :ARRAY[1..7] OF DINT :=[7(65536)];
-	g_absEncoderRes :ARRAY[1..7] OF DINT :=[7(16777216)];
+	g_absEncoderRes :ARRAY[1..7] OF DINT :=[7(131072)];
 	
 	// reduction ratio
-	g_motorReduction :ARRAY[1..7] OF LREAL :=[43.9658,26.859,26.8018,(66.0/10)*3,4554.0/130, 4554.0/130,5625.0/361];
+	g_motorReduction :ARRAY[1..7] OF LREAL :=[115.5/11.5,115.5/11.5,115.5/11.5,(4950.0/190.0)*(22.0/15.0), 2*5625.0/361.0,  2*5625.0/361.0,  2*(66.0/10.0 )];
 	g_absEncoderReduction :ARRAY[1..7] OF LREAL :=[7(1.0)];
 	
 	// motor parameters
-	g_motorTrqConst :ARRAY[1..7] OF LREAL :=[0.0538,0.0538,0.0538,0.0299,0.0193,0.0193,0.0193];
-	g_motorMaxCurrent :ARRAY[1..7] OF LREAL :=[1000,1000,1000,1000,300,200,220];//mA
+	g_motorTrqConst :ARRAY[1..7] OF LREAL :=[0.0385,0.0385,0.0385,0.0299,0.0219,0.0219,0.0219];
+	g_motorMaxCurrent :ARRAY[1..7] OF LREAL :=[10.8*1000,10.8*1000,10.8*1000,1.01*1000,314,314,314];//mA
 	
 	// motor and absEncoder direction
-	g_motorDir :ARRAY[1..2, 1..7] OF INT :=[1, 1, -1, 1, 1, -1, -1,	
-											1, 1, -1, 1, 1, -1, -1];
-	g_asbEncoderDir :ARRAY[1..2, 1..7] OF INT :=[-1, -1, 1, -1, 1, 1, 1,
-												 -1, -1, 1, -1, 1, 1, 1];
+	g_motorDir :ARRAY[1..2, 1..7] OF INT :=[1, -1, 1, -1, 1, -1, -1,	
+											1, -1, 1, -1, 1, -1, -1];
+	g_asbEncoderDir :ARRAY[1..2, 1..7] OF INT :=[1, -1, 1, 1, -1, 1, 1,
+												1, -1, 1, 1, -1, 1, 1];
 																 
 	// joint position limit
 	//TODO: joint7 is given a large limit for initialization moiton
 	//NOTE: joint 4 position is coupled with joint 2/3, so the limit is described by link side
-	g_minJntPos: ARRAY[1..2,1..7] OF LREAL:=[-60*g_deg2Rad,	-45*g_deg2Rad-pi/2,		-45*g_deg2Rad, 	-pi/2-220*g_deg2Rad, 	-135*g_deg2Rad+pi,		-45*g_deg2Rad-pi/2,		-330*g_deg2Rad,
-											 -60*g_deg2Rad,	-45*g_deg2Rad-pi/2,		-45*g_deg2Rad,	-pi/2+5*g_deg2Rad,		-135*g_deg2Rad+pi,		-45*g_deg2Rad+pi/2,	-330*g_deg2Rad];
-	g_maxJntPos: ARRAY[1..2,1..7] OF LREAL:=[60*g_deg2Rad,	60*g_deg2Rad-pi/2,		60*g_deg2Rad,		-pi/2-5*g_deg2Rad,			135*g_deg2Rad+pi,		45*g_deg2Rad-pi/2,		330*g_deg2Rad,
-								             60*g_deg2Rad,	60*g_deg2Rad-pi/2,		60*g_deg2Rad,		-pi/2+220*g_deg2Rad,			135*g_deg2Rad+pi,		45*g_deg2Rad+pi/2,		330*g_deg2Rad];
+	g_minJntPos: ARRAY[1..2,1..7] OF LREAL:=[-60*g_deg2Rad,	-45*g_deg2Rad-pi/2,		-45*g_deg2Rad, 	-pi/2-220*g_deg2Rad, 	-135*g_deg2Rad+pi,		-2.7,		-g_largeNum,
+											 -60*g_deg2Rad,	-45*g_deg2Rad-pi/2,		-45*g_deg2Rad,	-pi/2+5*g_deg2Rad,		-135*g_deg2Rad+pi,		-2.7,	-g_largeNum];
+	g_maxJntPos: ARRAY[1..2,1..7] OF LREAL:=[60*g_deg2Rad,	60*g_deg2Rad-pi/2,		60*g_deg2Rad,		-pi/2-5*g_deg2Rad,			135*g_deg2Rad+pi,		2.7,		g_largeNum,
+								             60*g_deg2Rad,	60*g_deg2Rad-pi/2,		60*g_deg2Rad,		-pi/2+220*g_deg2Rad,			135*g_deg2Rad+pi,		2.7,		g_largeNum];
 	
 	// joint velocity limit
 	g_maxJntVel :ARRAY[1..7] OF LREAL :=[7(2*pi)];

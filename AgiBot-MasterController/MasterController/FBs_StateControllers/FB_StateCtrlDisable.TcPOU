@@ -48,6 +48,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[SUPER^.Init(i_masterArm,r_masterArmCtrlCmd);
+m_jntOPMode:=g_allPosMode;
 
 // disable all joints
 m_jntEnableFlag :=g_zeroVec7i;
@@ -63,6 +64,7 @@ m_jntEnableFlag :=g_zeroVec7i;
     </LineIds>
     <LineIds Name="FB_StateCtrlDisable.init">
       <LineId Id="67" Count="0" />
+      <LineId Id="79" Count="0" />
       <LineId Id="60" Count="0" />
       <LineId Id="36" Count="0" />
       <LineId Id="59" Count="0" />

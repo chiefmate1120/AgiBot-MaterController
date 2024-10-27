@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_MasterRobot" Id="{8cbdb2ba-9735-46e3-8cbc-296330acc8cc}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_MasterRobot
 VAR
@@ -336,7 +336,9 @@ END_VAR]]></Declaration>
 	END_IF
 	
 	IF  MatchedSlaveArmIdx_NULL =  m_teleSlaveArmIdx[i] OR   NOT(i_masterInputDataPool.m_cartStatus.m_surgonReady) 
-		OR 	NOT(i_masterInputDataPool.m_slaveStatus.m_instruStauts[m_teleSlaveArmIdx[i]].m_ready) THEN
+		OR 	NOT(i_masterInputDataPool.m_slaveStatus.m_instruStauts[m_teleSlaveArmIdx[i]].m_ready) 
+		OR m_masterArmState[i] = MasterArmState_Error
+		OR  SlaveArmState_Error = m_instruArmState[i] OR SlaveArmState_Disable = m_instruArmState[i]  THEN
 		m_MSCtrlTriggerFlag[i]:=FALSE;
 		m_MSCtrlTriggerCheck[i].reset();
 	END_IF  
@@ -530,6 +532,7 @@ FOR i:=1 TO g_mArmNum DO
 		
 		//MasterSlave
 		MasterArmState_MasterSlave:
+			continue;
 			// to standdy
 			IF  (SlaveArmState_InstruReady <> m_instruArmState[i] AND SlaveArmState_MasterSlave <> m_instruArmState[i])
 				OR SlaveArmState_ScopeReady <> m_scopeArmState OR NOT(i_masterInputDataPool.m_cartStatus.m_surgonReady)
@@ -707,12 +710,7 @@ END_FOR]]></ST>
       <LineId Id="61" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterRobot.MSCtrlTriggerCheck">
-      <LineId Id="5" Count="0" />
-      <LineId Id="8" Count="0" />
-      <LineId Id="28" Count="0" />
-      <LineId Id="10" Count="3" />
-      <LineId Id="18" Count="2" />
-      <LineId Id="17" Count="0" />
+      <LineId Id="35" Count="12" />
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterRobot.run">
@@ -761,7 +759,9 @@ END_FOR]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterRobot.stateMachine">
-      <LineId Id="407" Count="185" />
+      <LineId Id="610" Count="102" />
+      <LineId Id="804" Count="0" />
+      <LineId Id="713" Count="82" />
       <LineId Id="225" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterRobot.updateShoulderPose">

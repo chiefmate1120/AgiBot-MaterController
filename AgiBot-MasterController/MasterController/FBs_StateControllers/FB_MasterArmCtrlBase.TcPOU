@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
   <POU Name="FB_MasterArmCtrlBase" Id="{dee0ec68-3abc-4720-b67c-0fb3fd57933b}" SpecialFunc="None">
     <Declaration><![CDATA[// Master Arm Base Controller, Hold at Current Posture
 FUNCTION_BLOCK FB_MasterArmCtrlBase IMPLEMENTS I_MasterArmCtrl
@@ -115,7 +115,7 @@ END_VAR
       <Implementation>
         <ST><![CDATA[m_timePeriod:=0;
 m_jntEnableFlag :=g_onesVec7i;
-m_jntOPMode:=g_allPosMode;
+m_jntOPMode:=g_allPosTrqMode;
 m_cmdCartPose:=i_masterArm.curCartPose;
 m_cmdCartTwist:=g_zeroVec6d;
 IF FALSE = m_holdLastCmds THEN
@@ -262,6 +262,9 @@ END_VAR
       <LineId Id="61" Count="0" />
       <LineId Id="84" Count="1" />
       <LineId Id="10" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MasterArmCtrlBase.timePeriod.Get">
+      <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

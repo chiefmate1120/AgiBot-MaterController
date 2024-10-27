@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_HandClutchCheck" Id="{2862370c-9cbe-4e26-a065-d84dc0dc8b05}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_HandClutchCheck
 VAR_INPUT
@@ -22,9 +22,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// TODO: The two hand clutch switch is mapped to 1/2 bits, but the IO value would change to 28 sometimes
-//IF (IOValue AND 10#3) > 0 THEN
-IF IOValue > 0 THEN
+        <ST><![CDATA[IF (IOValue AND 10#1) > 0 THEN
 	m_handClutchOnCounts := MIN(m_handClutchOnCounts +1, m_handClutchOnCountThres);
 ELSE
 	 m_handClutchOnCounts :=0;
@@ -38,10 +36,7 @@ run:=m_handClutchSwitch;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_HandClutchCheck.run">
-      <LineId Id="18" Count="0" />
-      <LineId Id="6" Count="0" />
-      <LineId Id="17" Count="0" />
-      <LineId Id="7" Count="4" />
+      <LineId Id="6" Count="5" />
       <LineId Id="5" Count="0" />
       <LineId Id="12" Count="0" />
     </LineIds>

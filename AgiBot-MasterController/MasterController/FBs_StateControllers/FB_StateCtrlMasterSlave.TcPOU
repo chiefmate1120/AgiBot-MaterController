@@ -21,7 +21,7 @@ VAR
 	m_boundaryTrq :Vec7d;
 	
 	// friction compensation scale
-	m_frictionCompScale :LREAL :=0.8;
+	m_frictionCompScale :LREAL :=1.0;
 
 END_VAR
 ]]></Declaration>

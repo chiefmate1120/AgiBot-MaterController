@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <GVL Name="GVL_ArmKinematic" Id="{fa1bdebf-5188-4d48-a57d-03bec0a3a2f4}">
     <Declaration><![CDATA[// use slot attribute larger than 49990, which is the default one, if it depends on variable in other file
 {attribute 'global_init_slot' := '49991'} 
@@ -44,7 +44,7 @@ g_shoulderRotInMonitor : Mat3d :=[0.0,	-1.0,	0.0,
 
 *)
 g_d1:LREAL:=0.26085;
-g_d4:LREAL:=0.1615;
+g_d4:LREAL:=0.156;
 g_a3:LREAL:=0.278;
 g_a4:LREAL:=0.365;
 g_a9:LREAL:=0.06;

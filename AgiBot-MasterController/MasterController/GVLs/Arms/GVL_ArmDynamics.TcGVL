@@ -3,7 +3,7 @@
   <GVL Name="GVL_ArmDynamics" Id="{9b85885b-751b-44dc-8cf0-ed9cdb7afd59}">
     <Declaration><![CDATA[{attribute 'global_init_slot' := '49992'}
 {attribute 'qualified_only'}
-// Robot3 Data
+// Robot8 Data
 VAR_GLOBAL CONSTANT
 	// arm gravity parameters
 	(*graParam=[ 2.7244*m3 + 2.7244*m4 + 2.7244*m5 + 2.7244*m6 + 9.8*mx2 + 9.8*mx9,
@@ -13,10 +13,10 @@ VAR_GLOBAL CONSTANT
 				mz5-my4,	my5+mz6,  	mx4,   	mx5, 	mx6,   	my6
 				preF2,   k2,   preF3,    k3,    preF5   k5]*)
 	g_gravityParam :ARRAY[1..2, 1..16] OF REAL := 
-		[ 6.2624762, -0.0007155225, 3.1411762, 0.48504608, -0.03459308, 0.025676297, 0.0000375, 0.0000351, -0.00001, -0.01593742,
-		  7.7845001, 3195.0, 7.7845, 1902.6574, 2.5056201, 481.81768,
-		  5.8820792, -0.0002385075, 2.9722568, 0.54387185, -0.037805167, 0.019637397, 0.000012500001, 0.0000117, -0.0000099999999, -0.013195626, 
-		  10.732782, 2910.6441, 15.50438, 1786.0662, 2.1109713, 393.46033];
+		  [5.2299, -0.0002385, 3.412, 0.9504, -0.03672, 0.02128, 0.0000125, 0.00003509, 0.0001715, -0.01263,
+			14.8917, 2220.8492, 10.045, 2875.1933, 3.3359, 630.0, 
+		  3.8610, -0.0007155, 3.54376, 1.09147, -0.037617, 0.0236, 0.0000375, 0.00001218, 0.00052255, -0.01313,
+			19.53629, 1471.9679, 9.3858, 3100.4051, 2.115, 727.6837];
 			
 	// gravity deviation
 	g_gravityDeviaion :ARRAY[1..2, 1..7] OF REAL :=
@@ -25,10 +25,10 @@ VAR_GLOBAL CONSTANT
 	  
 	// arm friction parameters [a1,b1,...a7,b7];
 	// friction = a * gravity + b; only joint 5 and 6 is identified
-	g_jntFrictionParam :ARRAY[1..2, 1..4] OF LREAL :=
-	[ 0.18558566, 0.013430012, 0.1933446, 0.0056009337,
-	  0.25838222, 0.0080955163, 0.3329508, 0.0062479093];
-	g_maxJntFriction : Vec7d :=[0, 0, 0, 0, 0.05, 0.05, 0];
+	g_jntFrictionParam :ARRAY[1..2, 1..14] OF LREAL :=
+	[ 0, 0.06026,  0.017, 0.1015,  0.00659, 0.0756,  0.3384, 0.01858,  0.3738, 0.00684, 0.3282, 0.0071,  0, 0.00279,
+	  0, 0.0537,  0, 0.0914,  0.0249, 0.07718,  0.298, 0.0334,  0.33139, 0.00768, 0.36325, 0.0076,  0, 0.00254];
+	g_maxJntFriction : Vec7d :=[0.2, 0.2, 0.2, 0.1, 0.1, 0.1, 0.01];
 	
 	//################ dynamic reference model parameters below ###########################
 	// link mass [m1, m2, m3, m4, m5, m6, m7, m8, m9]
@@ -62,11 +62,11 @@ VAR_GLOBAL CONSTANT
 	
 	// spring parameters
 	// spring2 [L0, b1, b2, l1, r0]
-	g_spring2Param :ARRAY[1..5] OF LREAL :=[101.6E-3, 14.5E-3, 15E-3, 172E-3, 31E-3];
+	g_spring2Param :ARRAY[1..5] OF LREAL :=[114.3E-3, 20E-3, 16E-3, 200E-3, 30E-3];
 	// spring3 [L0, b1, b2, l1, r0,d]
-	g_spring3Param :ARRAY[1..6] OF LREAL :=[101.6E-3, 14E-3, 15E-3, 172E-3, 30E-3, 10E-3];
+	g_spring3Param :ARRAY[1..6] OF LREAL :=[127.5E-3, 20E-3, 23E-3, 200E-3, 32E-3, 23E-3];
 	// spring5 [L0, s1, L1, r0, beta]
-	g_spring5Param :ARRAY[1..5] OF LREAL :=[34.93E-3, 34.3E-3, 100E-3, 12.5E-3, 32.02*g_deg2rad];
+	g_spring5Param :ARRAY[1..5] OF LREAL :=[70E-3, 17E-3, 121E-3, 7.5E-3, 32.02*g_deg2rad];
 	
 END_VAR]]></Declaration>
   </GVL>

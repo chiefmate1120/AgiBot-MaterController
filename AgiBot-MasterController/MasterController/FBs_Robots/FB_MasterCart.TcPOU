@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
   <POU Name="FB_MasterCart" Id="{05baaa0e-c853-48bc-a37c-d593cfa5bf2b}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_MasterCart
 VAR
@@ -93,8 +93,7 @@ VAR_IN_OUT CONSTANT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-//Foot trigger check
+        <ST><![CDATA[//Foot trigger check
 m_electricCutLeftOn := m_electricCutLeft AND m_electricCutLeftAllow AND m_armState[1] = MasterArmState_MasterSlave ;
 m_electricCutRightOn := m_electricCutRight AND m_electricCutRightAllow AND m_armState[2] = MasterArmState_MasterSlave ;
 m_electricCoagulLeftOn := m_electricCoagulLeft AND m_electricCoagulLeftAllow AND m_armState[1] = MasterArmState_MasterSlave ;
@@ -117,9 +116,9 @@ IF m_eleCtrlState = 1 THEN
 	ELSIF (m_electricCoagulLeftOn AND m_energyType[1] = InstruType_isBipolar) OR (m_electricCoagulRightOn AND  m_energyType[2] = InstruType_isBipolar) THEN
 		eleKnifeCtrl := EnergyCtrlWord_isBipolarCoagul;
 	ELSIF (m_electricCutLeftOn AND m_energyType[1] = InstruType_isUltraKnife) OR (m_electricCutRightOn AND  m_energyType[2] = InstruType_isUltraKnife) THEN
-		eleKnifeCtrl := EnergyCtrlWord_isUltraMax;
-	ELSIF (m_electricCoagulLeftOn AND m_energyType[1] = InstruType_isUltraKnife) OR (m_electricCoagulRightOn AND  m_energyType[2] = InstruType_isUltraKnife) THEN
 		eleKnifeCtrl := EnergyCtrlWord_isUltraMin;
+	ELSIF (m_electricCoagulLeftOn AND m_energyType[1] = InstruType_isUltraKnife) OR (m_electricCoagulRightOn AND  m_energyType[2] = InstruType_isUltraKnife) THEN
+		eleKnifeCtrl := EnergyCtrlWord_isUltraMax;
 		
 	ELSE
 		eleKnifeCtrl := EnergyCtrlWord_NoOutput;
@@ -552,29 +551,7 @@ END_FOR]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterCart.eleKnifeCtrl">
-      <LineId Id="9" Count="0" />
-      <LineId Id="8" Count="0" />
-      <LineId Id="6" Count="0" />
-      <LineId Id="10" Count="2" />
-      <LineId Id="15" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="7" Count="0" />
-      <LineId Id="14" Count="0" />
-      <LineId Id="27" Count="2" />
-      <LineId Id="31" Count="0" />
-      <LineId Id="30" Count="0" />
-      <LineId Id="16" Count="0" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="17" Count="0" />
-      <LineId Id="25" Count="1" />
-      <LineId Id="20" Count="0" />
-      <LineId Id="32" Count="1" />
-      <LineId Id="44" Count="0" />
-      <LineId Id="46" Count="2" />
-      <LineId Id="45" Count="0" />
-      <LineId Id="34" Count="1" />
-      <LineId Id="21" Count="0" />
-      <LineId Id="36" Count="1" />
+      <LineId Id="131" Count="31" />
       <LineId Id="18" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterCart.ergonomicAdjust">

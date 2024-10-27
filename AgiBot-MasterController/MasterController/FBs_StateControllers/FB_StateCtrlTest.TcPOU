@@ -16,7 +16,7 @@ VAR
 	m_testJntIdx :INT :=1;
 	
 	m_stepTestFlag :BOOL :=FALSE;
-	m_jntStep : LREAL := 5*g_deg2Rad;
+	m_jntStep : LREAL := 0*g_deg2Rad;
 	
 END_VAR
 ]]></Declaration>
@@ -33,7 +33,6 @@ VAR_IN_OUT CONSTANT
 END_VAR
 
 VAR 
-	i:INT :=0;
 	errThres :LREAL;
 	m_masterGripAngle: INT;
 END_VAR
@@ -55,13 +54,13 @@ IF m_testJntIdx >=1 AND m_testJntIdx <=7 THEN
 END_IF
 
 
-FOR i:=1 TO 3 DO 
-		errThres :=5*g_deg2rad;
-	IF ABS(m_cmdJntPos[i]-i_masterArm.curJntPos[i])>errThres THEN
-		m_isFinished:=TRUE;
-	END_IF
+//FOR i:=1 TO 3 DO 
+//		errThres :=5*g_deg2rad;
+//	IF ABS(m_cmdJntPos[i]-i_masterArm.curJntPos[i])>errThres THEN
+//		m_isFinished:=TRUE;
+//	END_IF
 	
-END_FOR
+//END_FOR
 ]]></ST>
       </Implementation>
     </Method>
@@ -84,6 +83,8 @@ SUPER^.Init(i_masterArm,r_masterArmCtrlCmd);
 
 m_initJntPos := i_masterArm.curJntPos;
 
+m_jntOPMode := g_allPosTrqMode;
+
 // update commands to arm
 copyCmds(r_masterArmCtrlCmd);]]></ST>
       </Implementation>
@@ -105,17 +106,16 @@ copyCmds(r_masterArmCtrlCmd);]]></ST>
       <LineId Id="134" Count="0" />
       <LineId Id="161" Count="0" />
       <LineId Id="117" Count="0" />
-      <LineId Id="111" Count="0" />
-      <LineId Id="125" Count="0" />
-      <LineId Id="127" Count="1" />
-      <LineId Id="126" Count="0" />
-      <LineId Id="118" Count="1" />
+      <LineId Id="245" Count="5" />
+      <LineId Id="119" Count="0" />
       <LineId Id="113" Count="0" />
     </LineIds>
     <LineIds Name="FB_StateCtrlTest.init">
       <LineId Id="67" Count="4" />
       <LineId Id="81" Count="0" />
       <LineId Id="80" Count="0" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="106" Count="0" />
       <LineId Id="91" Count="1" />
       <LineId Id="90" Count="0" />
     </LineIds>
