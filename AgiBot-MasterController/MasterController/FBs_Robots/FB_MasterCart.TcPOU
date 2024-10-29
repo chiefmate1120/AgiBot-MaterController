@@ -263,20 +263,19 @@ END_FOR
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="monitorAngLink2Motor" Id="{be375282-cfa2-4973-91da-b3215777ab52}">
+    <Method Name="monitorAngCalc" Id="{1b8a541f-7ef9-4562-b22e-b259ed591d2e}">
       <Declaration><![CDATA[// TODO
-METHOD PROTECTED monitorAngLink2Motor : LREAL
+METHOD PROTECTED monitorAngCalc : LREAL
 VAR_INPUT
 	i_linkPos:LREAL;
 END_VAR
 VAR
 	A,B,C,D,E,F,G,H,I,X0,X1,X2,X3,X4,X5,X6,X7,X8,X9,X10,X11,X12,Z0:LREAL;	
-	offset :LREAL := 0.8877;
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-X0:=i_linkPos+offset;  //监视器旋转
+X0:=i_linkPos;  //监视器旋转
 
 A:=227; B:=216; C:=159.285; D:=150.297; E:=195; F:=130; G:=137; H:=40; I:=99;
 X4:=ATAN(H/I); X5:=ATAN(F/G);
@@ -291,7 +290,39 @@ X2:=X5-X6;
 X3:=pi-X7+X2;
 X1:=X3-X4;
 
-monitorAngLink2Motor:=-X2;
+monitorAngCalc:=X1;
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="monitorAngLink2Motor" Id="{be375282-cfa2-4973-91da-b3215777ab52}">
+      <Declaration><![CDATA[// TODO
+METHOD PROTECTED monitorAngLink2Motor : LREAL
+VAR_INPUT
+	i_linkPos:LREAL;
+END_VAR
+VAR
+	A,B,C,D,E,F,G,H,I,X0,X1,X2,X3,X4,X5,X6,X7,X8,X9,X10,X11,X12,Z0:LREAL;	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+X0:=i_linkPos;  //监视器旋转
+
+A:=227; B:=216; C:=159.285; D:=150.297; E:=195; F:=130; G:=137; H:=40; I:=99;
+X4:=ATAN(H/I); X5:=ATAN(F/G);
+X8:=SQRT(F*F+G*G);
+X12:=sqrt(H*H+I*I);
+X9:=sqrt(E*E+X12*X12-2*E*X12*cos(X0));
+X6:=acos((B*B+X8*X8-X9*X9)/(2*B*X8));
+X10:=acos((B*B+X9*X9-X8*X8)/(2*B*X9));
+X11:=acos((X9*X9+X12*X12-E*E)/(2*X9*X12));
+X7:=X10+X11;
+X2:=X5-X6;
+X3:=pi-X7+X2;
+X1:=X3-X4;
+
+monitorAngLink2Motor:=X2;
 
 ]]></ST>
       </Implementation>
@@ -304,10 +335,9 @@ VAR_INPUT
 END_VAR
 VAR
 	A,B,C,D,E,F,G,H,I,X0,X1,X2,X3,X4,X5,X6,X7,X8,X9,X10,X11,X12,Z0:LREAL;	
-	offset :LREAL := 0.8877;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[X2:=-i_motorPos;
+        <ST><![CDATA[X2:=i_motorPos;
 
 A:=227; B:=216; C:=159.285; D:=150.297; E:=195; F:=130; G:=137; H:=40; I:=99;
 X5:=atan(F/G);
@@ -317,7 +347,7 @@ X9:=sqrt(B*B+X8*X8-2*B*X8*cos(X6));
 X12:=SQRT(H*H+I*I);
 X0:=ACOS((E*E+X12*X12-X9*X9)/(2*E*X12));
 
-monitorAngMotor2Link:=X0-offset;]]></ST>
+monitorAngMotor2Link:=X0;]]></ST>
       </Implementation>
     </Method>
     <Method Name="reachUITargetCheck" Id="{58f1d629-33ee-4e90-90f3-a5c453c13e46}">
@@ -524,11 +554,11 @@ FOR i:=1 TO 4 DO
 	m_cmdJntCurrent[i]:=m_cartJoints[i].cmdCurrent;
 END_FOR 
 
+// get monitor angle
+m_cartStatus.m_monitorAngle:= monitorAngCalc(m_curLinkPos[2]);
+
 // transfer monitor angle from link side to motor side
 m_curLinkPos[2]:= monitorAngLink2Motor(m_curLinkPos[2]);
-
-// get monitor angle
-m_cartStatus.m_monitorAngle:= m_cartJoints[2].linkPos;
 
 // check if cart in motion
 m_cartStatus.m_consoleInAdjust:=FALSE;
@@ -620,6 +650,10 @@ END_FOR]]></ST>
       <LineId Id="72" Count="20" />
       <LineId Id="5" Count="0" />
     </LineIds>
+    <LineIds Name="FB_MasterCart.monitorAngCalc">
+      <LineId Id="6" Count="17" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="FB_MasterCart.monitorAngLink2Motor">
       <LineId Id="6" Count="17" />
       <LineId Id="5" Count="0" />
@@ -661,7 +695,11 @@ END_FOR]]></ST>
       <LineId Id="91" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterCart.updateStatus">
-      <LineId Id="69" Count="37" />
+      <LineId Id="69" Count="15" />
+      <LineId Id="88" Count="2" />
+      <LineId Id="116" Count="1" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="91" Count="15" />
       <LineId Id="59" Count="0" />
     </LineIds>
   </POU>

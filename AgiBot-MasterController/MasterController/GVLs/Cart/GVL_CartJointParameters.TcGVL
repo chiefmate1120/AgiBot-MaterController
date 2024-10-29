@@ -25,8 +25,8 @@ VAR_GLOBAL CONSTANT
 	g_asbEncoderDir :ARRAY[1..4] OF INT :=[-1, 1, -1, -1];
 																 
 	// joint position limit
-	g_minJntPos: ARRAY[1..4] OF LREAL:=[0,0*g_deg2Rad,0,0];
-	g_maxJntPos: ARRAY[1..4] OF LREAL:=[0.37,32*g_deg2Rad,0.23,0.18];
+	g_minJntPos: ARRAY[1..4] OF LREAL:=[0,-38*g_deg2Rad,0,0];
+	g_maxJntPos: ARRAY[1..4] OF LREAL:=[0.37,12*g_deg2Rad,0.23,0.18];
 		
 	// joint motion velocity 
 	g_jntCtrlMotionVel :ARRAY[1..7] OF LREAL :=[0.015,2*g_deg2Rad,0.01,0.0075];

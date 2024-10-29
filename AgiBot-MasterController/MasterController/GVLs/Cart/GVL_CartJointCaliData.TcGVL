@@ -28,7 +28,7 @@ VAR_GLOBAL CONSTANT
 		 
 	// joint position at link encoder calibrated point
 	//TODO: joint2 calibration position need to be checked
-	g_linkEncCaliJntPos :ARRAY[1..4] OF LREAL :=[0, 0*g_deg2Rad,0,0];
+	g_linkEncCaliJntPos :ARRAY[1..4] OF LREAL :=[0, 40.4*g_deg2Rad,0,0];
 
 END_VAR]]></Declaration>
   </GVL>

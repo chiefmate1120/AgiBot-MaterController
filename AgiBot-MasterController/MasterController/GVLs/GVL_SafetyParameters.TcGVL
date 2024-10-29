@@ -54,8 +54,8 @@ VAR_GLOBAL CONSTANT
 	g_cartMaxJntVel :Vec4d :=[0.03, 4*g_deg2Rad,0.02,0.015];
 	
 	// cart joint limit
-	g_cartMinJntLimit : Vec4d :=[0-0.1, -(0+5)*g_deg2Rad, 0-0.1, 0-0.1];
-	g_cartMaxJntLimit : Vec4d :=[0.38+0.1, (30+5)*g_deg2Rad, 0.24+0.1, 0.2+0.1];
+	g_cartMinJntLimit : Vec4d :=[0-0.1, -(38+5)*g_deg2Rad, 0-0.1, 0-0.1];
+	g_cartMaxJntLimit : Vec4d :=[0.38+0.1, (12+5)*g_deg2Rad, 0.24+0.1, 0.2+0.1];
 	
 	//cart joint follow error
 	g_cartMaxJntFollowErr : Vec4d :=[0.01, 5*g_deg2rad, 0.01, 0.01];
