@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="MasterArmControl" Id="{6192c11b-cd6e-4883-b627-958acfb9caf3}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MasterArmControl
 VAR

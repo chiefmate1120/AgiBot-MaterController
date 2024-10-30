@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_MasterRobot" Id="{8cbdb2ba-9735-46e3-8cbc-296330acc8cc}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_MasterRobot
 VAR
@@ -231,8 +231,10 @@ FOR i:=1 TO g_mArmNum DO
 	// current info
 	r_masterStatus.m_gripAngle[i]:=m_masterArms[i].gripAngle;
 	// cartesion
-	r_masterStatus.m_curArmPose[i]:=m_masterArms[i].curCartPose;
-	r_masterStatus.m_curArmTwist[i]:=m_masterArms[i].curCartTwist;
+//	r_masterStatus.m_curArmPose[i]:=m_masterArms[i].curCartPose;
+//	r_masterStatus.m_curArmTwist[i]:=m_masterArms[i].curCartTwist;
+	r_masterStatus.m_curArmPose[i]:=m_masterArms[i].m_curCartLinkPose;
+	r_masterStatus.m_curArmTwist[i]:=m_masterArms[i].m_curCartLinkTwist;
 	// joint
 	r_masterJointsData.m_curMotorPos[i]:=m_masterArms[i].curMotorPos;
 	r_masterJointsData.m_curLinkPos[i]:=m_masterArms[i].curLinkPos;
@@ -676,7 +678,9 @@ END_FOR]]></ST>
       <LineId Id="21" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterRobot.getStatus">
-      <LineId Id="124" Count="34" />
+      <LineId Id="124" Count="10" />
+      <LineId Id="172" Count="1" />
+      <LineId Id="135" Count="23" />
       <LineId Id="21" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterRobot.Init">

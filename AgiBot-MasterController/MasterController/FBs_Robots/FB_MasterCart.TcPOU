@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_MasterCart" Id="{05baaa0e-c853-48bc-a37c-d593cfa5bf2b}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_MasterCart
 VAR
@@ -558,7 +558,7 @@ END_FOR
 m_cartStatus.m_monitorAngle:= monitorAngCalc(m_curLinkPos[2]);
 
 // transfer monitor angle from link side to motor side
-m_curLinkPos[2]:= monitorAngLink2Motor(m_curLinkPos[2]);
+m_curLinkPos[2]:= monitorAngLink2Motor(m_cartJoints[2].linkPos);
 
 // check if cart in motion
 m_cartStatus.m_consoleInAdjust:=FALSE;

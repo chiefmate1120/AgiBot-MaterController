@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <GVL Name="GVL_CartJointParameters" Id="{c84079e2-419b-45d5-aeb0-1f4f362f3cde}">
     <Declaration><![CDATA[{attribute 'global_init_slot' := '49991'}
 {attribute 'qualified_only'}
@@ -21,12 +21,12 @@ VAR_GLOBAL CONSTANT
 	g_motorMaxCurrent :ARRAY[1..4] OF LREAL :=[4(1000)];//mA
 	
 	// motor and absEncoder direction
-	g_motorDir :ARRAY[1..4] OF INT :=[1, 1, 1, -1];
+	g_motorDir :ARRAY[1..4] OF INT :=[1, -1, 1, -1];
 	g_asbEncoderDir :ARRAY[1..4] OF INT :=[-1, 1, -1, -1];
 																 
 	// joint position limit
-	g_minJntPos: ARRAY[1..4] OF LREAL:=[0,-38*g_deg2Rad,0,0];
-	g_maxJntPos: ARRAY[1..4] OF LREAL:=[0.37,12*g_deg2Rad,0.23,0.18];
+	g_minJntPos: ARRAY[1..4] OF LREAL:=[0,-31*g_deg2Rad,0,0];
+	g_maxJntPos: ARRAY[1..4] OF LREAL:=[0.37,2.61*g_deg2Rad,0.23,0.18];
 		
 	// joint motion velocity 
 	g_jntCtrlMotionVel :ARRAY[1..7] OF LREAL :=[0.015,2*g_deg2Rad,0.01,0.0075];

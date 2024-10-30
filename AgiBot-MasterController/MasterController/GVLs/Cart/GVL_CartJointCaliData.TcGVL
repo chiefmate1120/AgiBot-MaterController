@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <GVL Name="GVL_CartJointCaliData" Id="{9bad5a74-c717-4d0d-b524-56b1418cee8b}">
     <Declaration><![CDATA[{attribute 'qualified_only'}
 // Robot3 Data
@@ -8,13 +8,13 @@ VAR_GLOBAL CONSTANT
 	[monitor lift, monitor rotate, armset, pedal] *)
 
 	// absolute encoder value at minimal joint positon
-	g_minLinkEncoder :ARRAY[1..4] OF DINT :=[10551943, 13637932, 8646306,11744290];
+	g_minLinkEncoder :ARRAY[1..4] OF DINT :=[10551943, 13485000, 8646306,11744290];
 		 
 	// absolute encoder value at maximum joint positon
-	g_maxLinkEncoder :ARRAY[1..4] OF DINT :=[9057645, 16333724,7704162,10974938];
+	g_maxLinkEncoder :ARRAY[1..4] OF DINT :=[9057645, 16376724,7704162,10974938];
 	
 	// absolute encoder value at calibrated positon
-	g_caliLinkEncoder :ARRAY[1..4] OF DINT :=[10551943, 13637932, 8646306,11744290];
+	g_caliLinkEncoder :ARRAY[1..4] OF DINT :=[10551943, 13485000, 8646306,11744290];
 	
 	// if absolute encoder value cross zeros within joint motion range
 	g_linkEncZeroCross :ARRAY[1..4] OF INT :=[0, 0, 0, 0];
@@ -28,7 +28,7 @@ VAR_GLOBAL CONSTANT
 		 
 	// joint position at link encoder calibrated point
 	//TODO: joint2 calibration position need to be checked
-	g_linkEncCaliJntPos :ARRAY[1..4] OF LREAL :=[0, 40.4*g_deg2Rad,0,0];
+	g_linkEncCaliJntPos :ARRAY[1..4] OF LREAL :=[0, 46.264*g_deg2Rad,0,0];
 
 END_VAR]]></Declaration>
   </GVL>

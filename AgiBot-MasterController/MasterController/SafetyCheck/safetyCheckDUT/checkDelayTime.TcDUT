@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
   <DUT Name="checkDelayTime" Id="{1842a9f8-6be9-44f3-b29d-ddeaee55cb3b}">
     <Declaration><![CDATA[TYPE checkDelayTime :
 STRUCT
 	//motor encoder and joint encoder deviation delay time
-	Ti_armJntEncErr:TIME:=T#0.1S;
+	Ti_armJntEncErr:TIME:=T#0.001S;
 	//drive error delay time
 	Ti_driveErr:TIME:=T#0.1S;
 	//joint encoder ununuited delay time
