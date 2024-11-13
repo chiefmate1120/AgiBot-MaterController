@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
   <POU Name="FB_MasterRobot" Id="{8cbdb2ba-9735-46e3-8cbc-296330acc8cc}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_MasterRobot
 VAR
@@ -339,7 +339,7 @@ END_VAR]]></Declaration>
 	
 	IF  MatchedSlaveArmIdx_NULL =  m_teleSlaveArmIdx[i] OR   NOT(i_masterInputDataPool.m_cartStatus.m_surgonReady) 
 		OR 	NOT(i_masterInputDataPool.m_slaveStatus.m_instruStauts[m_teleSlaveArmIdx[i]].m_ready) 
-		OR m_masterArmState[i] = MasterArmState_Error
+		OR m_masterArmState[i] = MasterArmState_Error OR i_masterInputDataPool.m_cartStatus.m_consoleInAdjust
 		OR  SlaveArmState_Error = m_instruArmState[i] OR SlaveArmState_Disable = m_instruArmState[i]  THEN
 		m_MSCtrlTriggerFlag[i]:=FALSE;
 		m_MSCtrlTriggerCheck[i].reset();
@@ -493,7 +493,7 @@ FOR i:=1 TO g_mArmNum DO
 			ELSIF enableClutch THEN
 				m_nextMasterArmState[i] := MasterArmState_Clutch; 
 			// to cart
-			ELSIF i_masterInputDataPool.m_cartStatus.m_consoleInAdjust THEN
+			ELSIF i_masterInputDataPool.m_cartStatus.m_monitorInAdjust THEN
 				m_nextMasterArmState[i] := MasterArmState_Cart;
 			END_IF
 		
@@ -510,7 +510,7 @@ FOR i:=1 TO g_mArmNum DO
 						OR m_armSwitchFlag[i] THEN
 				m_nextMasterArmState[i]:=MasterArmState_Standby;
 			// to cart
-			ELSIF i_masterInputDataPool.m_cartStatus.m_consoleInAdjust THEN
+			ELSIF i_masterInputDataPool.m_cartStatus.m_monitorInAdjust THEN
 				m_nextMasterArmState[i] := MasterArmState_Cart;
 			END_IF
 		
@@ -524,10 +524,10 @@ FOR i:=1 TO g_mArmNum DO
 			ELSIF enableClutch THEN
 				m_nextMasterArmState[i] := MasterArmState_Clutch; 
 			// to cart
-			ELSIF i_masterInputDataPool.m_cartStatus.m_consoleInAdjust THEN
+			ELSIF i_masterInputDataPool.m_cartStatus.m_monitorInAdjust THEN
 				m_nextMasterArmState[i] := MasterArmState_Cart;
 			// to master-slave
-			ELSIF SlaveArmState_InstruReady = m_instruArmState[i] AND SlaveArmState_ScopeReady = m_scopeArmState 
+			ELSIF SlaveArmState_InstruReady = m_instruArmState[i] AND SlaveArmState_ScopeReady = m_scopeArmState AND NOT(i_masterInputDataPool.m_cartStatus.m_consoleInAdjust)
 					AND i_masterInputDataPool.m_cartStatus.m_surgonReady AND m_MSCtrlTriggerFlag[i] AND i_masterInputDataPool.m_slaveStatus.m_asepticDeployCompleteFlag THEN
 				m_nextMasterArmState[i] := MasterArmState_MasterSlave;
 			END_IF
@@ -560,9 +560,6 @@ FOR i:=1 TO g_mArmNum DO
 			// to clutch
 			ELSIF enableClutch THEN
 				m_nextMasterArmState[i] := MasterArmState_Clutch; 
-			// to cart
-			ELSIF i_masterInputDataPool.m_cartStatus.m_consoleInAdjust THEN
-				m_nextMasterArmState[i] := MasterArmState_Cart;
 			END_IF
 			
 		// Cart 
@@ -770,7 +767,8 @@ END_FOR]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterRobot.stateMachine">
-      <LineId Id="407" Count="185" />
+      <LineId Id="407" Count="128" />
+      <LineId Id="539" Count="53" />
       <LineId Id="225" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterRobot.updateShoulderPose">

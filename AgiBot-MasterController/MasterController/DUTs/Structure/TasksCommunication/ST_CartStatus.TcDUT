@@ -13,6 +13,7 @@ STRUCT
 	m_instrumentPowerSwitch:BOOL := FALSE;
 	m_surgonReady :BOOL :=false;
 	m_consoleInAdjust:BOOL := FALSE;
+	m_monitorInAdjust:BOOL := FALSE;
 	m_consoleInManualAdjust:BOOL := FALSE;
 	m_ergonAdjustArrival :BOOL;
 	m_cancelErgonAdjustArrival :BOOL;

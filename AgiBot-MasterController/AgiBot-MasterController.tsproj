@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.29" TcVersionFixed="true">
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.53" TcVersionFixed="true">
 	<DataTypes>
 		<DataType>
 			<Name GUID="{5C5B5A05-1109-4835-A488-5EC522387A1D}">MSCommu_InstruStatus</Name>
@@ -270,7 +270,7 @@
 			</SubItem>
 		</DataType>
 		<DataType>
-			<Name GUID="{0BD048C8-F98A-BAAD-1403-26799A8FFD1A}" AutoDeleteType="true">ST_CartStatus</Name>
+			<Name GUID="{32049157-EE4E-66EF-B953-F74D5CE5F3CA}" AutoDeleteType="true">ST_CartStatus</Name>
 			<Comment><![CDATA[ Output from cart control task
  Input to master arm control task  ]]></Comment>
 			<BitSize>256</BitSize>
@@ -347,7 +347,7 @@
 				</Default>
 			</SubItem>
 			<SubItem>
-				<Name>m_consoleInManualAdjust</Name>
+				<Name>m_monitorInAdjust</Name>
 				<Type GUID="{18071995-0000-0000-0000-000000000030}">BOOL</Type>
 				<BitSize>8</BitSize>
 				<BitOffs>176</BitOffs>
@@ -356,16 +356,25 @@
 				</Default>
 			</SubItem>
 			<SubItem>
-				<Name>m_ergonAdjustArrival</Name>
+				<Name>m_consoleInManualAdjust</Name>
 				<Type GUID="{18071995-0000-0000-0000-000000000030}">BOOL</Type>
 				<BitSize>8</BitSize>
 				<BitOffs>184</BitOffs>
+				<Default>
+					<Bool>false</Bool>
+				</Default>
+			</SubItem>
+			<SubItem>
+				<Name>m_ergonAdjustArrival</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000030}">BOOL</Type>
+				<BitSize>8</BitSize>
+				<BitOffs>192</BitOffs>
 			</SubItem>
 			<SubItem>
 				<Name>m_cancelErgonAdjustArrival</Name>
 				<Type GUID="{18071995-0000-0000-0000-000000000030}">BOOL</Type>
 				<BitSize>8</BitSize>
-				<BitOffs>192</BitOffs>
+				<BitOffs>200</BitOffs>
 			</SubItem>
 			<SubItem>
 				<Name>m_pedalHover</Name>
@@ -375,7 +384,7 @@
 					<Elements>2</Elements>
 				</ArrayInfo>
 				<BitSize>16</BitSize>
-				<BitOffs>200</BitOffs>
+				<BitOffs>208</BitOffs>
 			</SubItem>
 			<SubItem>
 				<Name>m_electricKnifePedalTrigger</Name>
@@ -1524,7 +1533,7 @@
 		</System>
 		<Plc>
 			<Project GUID="{0C182974-8910-4DEE-A0B7-B414028AF699}" Name="MasterController" PrjFilePath="MasterController\MasterController.plcproj" TmcFilePath="MasterController\MasterController.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="MasterController\MasterController.tmc">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="MasterController\MasterController.tmc" TmcHash="{7608DAE4-C8CB-B403-8EE8-B29CC4673BBF}">
 					<Name>MasterController Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -1542,7 +1551,7 @@
 						<Var>
 							<Name>MasterArmControl.m_masterInputDataPool.m_cartStatus</Name>
 							<Comment><![CDATA[ cart information, import from other task]]></Comment>
-							<Type GUID="{0BD048C8-F98A-BAAD-1403-26799A8FFD1A}">ST_CartStatus</Type>
+							<Type GUID="{32049157-EE4E-66EF-B953-F74D5CE5F3CA}">ST_CartStatus</Type>
 						</Var>
 						<Var>
 							<Name>MasterArmControl.m_masterInputDataPool.m_masterDynaData</Name>
@@ -1838,7 +1847,7 @@
 						<Var>
 							<Name>CartControl.m_cartStatus</Name>
 							<Comment><![CDATA[ Output cart status]]></Comment>
-							<Type GUID="{0BD048C8-F98A-BAAD-1403-26799A8FFD1A}">ST_CartStatus</Type>
+							<Type GUID="{32049157-EE4E-66EF-B953-F74D5CE5F3CA}">ST_CartStatus</Type>
 						</Var>
 						<Var>
 							<Name>CartControl.m_cartJointData</Name>
@@ -1866,7 +1875,7 @@
 						<Var>
 							<Name>SafetyCheck.m_cartStatus</Name>
 							<Comment><![CDATA[cart status]]></Comment>
-							<Type GUID="{0BD048C8-F98A-BAAD-1403-26799A8FFD1A}">ST_CartStatus</Type>
+							<Type GUID="{32049157-EE4E-66EF-B953-F74D5CE5F3CA}">ST_CartStatus</Type>
 						</Var>
 						<Var>
 							<Name>SafetyCheck.m_cartJointData</Name>
@@ -1948,9 +1957,21 @@
 							</OwnerB>
 						</OwnerA>
 					</UnrestoredVarLinks>
+					<UnrestoredVarLinks ImportTime="2024-11-13T12:08:30">
+						<OwnerA Name="InputDst" Prefix="TIPC^MasterController^MasterController Instance" Type="1">
+							<OwnerB Name="TIPC^MasterController^MasterController Instance">
+								<Link VarA="MasterArmControl.m_masterInputDataPool.m_cartStatus" TypeA="ST_CartStatus" InOutA="0" GuidA="{0BD048C8-F98A-BAAD-1403-26799A8FFD1A}" VarB="TaskCartControl Outputs^CartControl.m_cartStatus" RestoreInfo="TypeChanged" IdA="2428"/>
+							</OwnerB>
+						</OwnerA>
+						<OwnerA Name="OutputSrc" Prefix="TIPC^MasterController^MasterController Instance" Type="2">
+							<OwnerB Name="TIPC^MasterController^MasterController Instance">
+								<Link VarA="CartControl.m_cartStatus" TypeA="ST_CartStatus" InOutA="1" GuidA="{0BD048C8-F98A-BAAD-1403-26799A8FFD1A}" VarB="TaskSafetyCheck Inputs^SafetyCheck.m_cartStatus" RestoreInfo="TypeChanged" IdA="2447"/>
+							</OwnerB>
+						</OwnerA>
+					</UnrestoredVarLinks>
 					<Contexts>
 						<Context>
-							<Id NeedCalleeCall="true">0</Id>
+							<Id>0</Id>
 							<Name>TaskArmControl</Name>
 							<ManualConfig>
 								<OTCID>#x02010030</OTCID>
@@ -1959,7 +1980,7 @@
 							<CycleTime>250000</CycleTime>
 						</Context>
 						<Context>
-							<Id NeedCalleeCall="true">1</Id>
+							<Id>1</Id>
 							<Name>TaskDynamic</Name>
 							<ManualConfig>
 								<OTCID>#x02010040</OTCID>
@@ -1968,7 +1989,7 @@
 							<CycleTime>1000000</CycleTime>
 						</Context>
 						<Context>
-							<Id NeedCalleeCall="true">2</Id>
+							<Id>2</Id>
 							<Name>TaskCartControl</Name>
 							<ManualConfig>
 								<OTCID>#x02010060</OTCID>
@@ -1977,7 +1998,7 @@
 							<CycleTime>1000000</CycleTime>
 						</Context>
 						<Context>
-							<Id NeedCalleeCall="true">3</Id>
+							<Id>3</Id>
 							<Name>TaskSafetyCheck</Name>
 							<ManualConfig>
 								<OTCID>#x02010050</OTCID>
