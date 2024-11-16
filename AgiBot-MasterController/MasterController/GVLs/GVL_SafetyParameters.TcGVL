@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
   <GVL Name="GVL_SafetyParameters" Id="{4906139b-c485-4ef4-98db-c81851105e40}">
     <Declaration><![CDATA[{attribute 'global_init_slot' := '49991'}
 //TODO: safety check parameters need to be reviewd
@@ -73,6 +73,7 @@ VAR_GLOBAL
 	g_motorCurrentLimit : Vec7d ;	
 
 	g_arrayErrCodeArm:ARRAY [1..g_maxNum] OF ARRAY [0..100] OF UDINT;	
+	g_ArrayErrCodeTypeTest:ARRAY [1..3] OF ARRAY [0..100] OF UDINT;
 END_VAR
 
 VAR_GLOBAL CONSTANT

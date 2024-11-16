@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
   <POU Name="Fb_SafetyCheck" Id="{d7e5b419-2971-4dae-96a7-39fe3a1a6245}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK Fb_SafetyCheck
 VAR_INPUT
@@ -67,8 +67,7 @@ VAR
 	k:INT;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-//驱动器状态监测、驱动器未连接
+        <ST><![CDATA[//驱动器状态监测、驱动器未连接
 FOR i:=1 TO g_mJntNum BY 1 DO
 	m_checkDelay[i_ArmId].T_jntStatusErr[i](IN:= (i_safetyCheckVar[i_ArmId].m_masterDriverInput[i].m_statusWord=0 AND m_checkPermit[i_ArmId].m_jntStatusErr[i]), PT:=m_checkDelayTime.Ti_jntStatusErr , Q=> , ET=> );
 	IF m_checkDelay[i_ArmId].T_jntStatusErr[i].Q  THEN
@@ -125,12 +124,12 @@ END_FOR
 
 
 //关节跟随误差过大
-FOR i:=1 TO g_mJntNum BY 1 DO
-	m_checkDelay[i_ArmId].T_armJntFollowErr[i](IN:= ABS(i_masterJointData.m_cmdJntPos[i_armId][i]- i_masterJointData.m_curJntPos[i_armId][i])>g_armMaxJntFollowErr[i]  AND m_checkPermit[i_ArmId].m_armJntFollowErr[i], PT:=m_checkDelayTime.Ti_armJntFollowErr , Q=> , ET=> );
-	IF m_checkDelay[i_ArmId].T_armJntFollowErr[i].Q THEN
-		errCodeAssign(i_ArmId, i_ArmId,  0, i, 16#2002, m_rcvLevel );
-	END_IF
-END_FOR
+//FOR i:=1 TO g_mJntNum BY 1 DO
+//	m_checkDelay[i_ArmId].T_armJntFollowErr[i](IN:= ABS(i_masterJointData.m_cmdJntPos[i_armId][i]- i_masterJointData.m_curJntPos[i_armId][i])>g_armMaxJntFollowErr[i]  AND m_checkPermit[i_ArmId].m_armJntFollowErr[i], PT:=m_checkDelayTime.Ti_armJntFollowErr , Q=> , ET=> );
+//	IF m_checkDelay[i_ArmId].T_armJntFollowErr[i].Q THEN
+//		errCodeAssign(i_ArmId, i_ArmId,  0, i, 16#2002, m_rcvLevel );
+//	END_IF
+//END_FOR
 
 
 //笛卡尔空间指令与位置偏差检测
@@ -161,19 +160,19 @@ END_FOR
 
 //self check failure
 IF i_masterStatus.m_armState[i_armId] = MasterArmState_Home AND i_masterStatus.m_timePeriod[i] > g_selfCheckTimeLimit THEN//i_safetyCheckVar[i_armId].m_selfCheckFail THEN
-	errCodeAssign(i_armId, i_ArmId,  0, i, 16#2008, m_rcvLevel );
+	errCodeAssign(i_armId, i_ArmId,  0, 0, 16#2010, m_rcvLevel );
 END_IF
 
 //motor encoder mutation detection
 FOR i:=1 TO g_mJntNum BY 1 DO
 	IF i_safetyCheckVar[i_armId].m_motorEncSaltaValue[i]>g_maxJntCurSalta[i] THEN
-		errCodeAssign(i_armId, i_ArmId+3, 0, i, 16#200C, m_rcvLevel );
+		errCodeAssign(i_armId, i_ArmId, 0, i, 16#200C, m_rcvLevel );
 	END_IF
 END_FOR
 
 //master hall anomaly
 IF i_masterStatus.m_gripHallSensor[i_armId] = 0 THEN
-	errCodeAssign(i_armId, i_ArmId+3, 0, i, 16#200E, m_rcvLevel );
+	errCodeAssign(i_armId, i_ArmId, 0, 0, 16#200E, m_rcvLevel );
 END_IF
 ]]></ST>
       </Implementation>
@@ -258,8 +257,7 @@ VAR
 	i:INT;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-FOR i:=0 TO 20 BY 1 DO
+        <ST><![CDATA[FOR i:=0 TO 99 BY 1 DO
 	arrayFILO[i]:=i_array[i];
 	IF i_array[i]=0 THEN
 		arrayFILO[i]:=i_newData;
@@ -459,12 +457,12 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-m_errCodeUpdateTon[m_unrcvLevel](IN:= NOT m_errCodeUpdateFlag[3], PT:=m_codeUpdateDelay , Q=> m_errCodeUpdateFlag[3], ET=> );
+        <ST><![CDATA[m_errCodeUpdateTon[m_unrcvLevel](IN:= NOT m_errCodeUpdateFlag[3], PT:=m_codeUpdateDelay , Q=> m_errCodeUpdateFlag[3], ET=> );
 IF m_errCodeUpdateFlag[m_unrcvLevel] THEN
 	IF m_errNumType[m_unrcvLevel]>=1 THEN
 		m_ArrayErrCodeType[m_unrcvLevel]:=ArrayDeleteFrist(i_Array:=m_ArrayErrCodeType[3]) ;
 		o_ErrCode[m_unrcvLevel]:=m_ArrayErrCodeType[m_unrcvLevel][0] ;
+		g_ArrayErrCodeTypeTest[m_unrcvLevel]:=arrayFILO(i_Array:= g_ArrayErrCodeTypeTest[m_unrcvLevel], i_NewData:=o_ErrCode[m_unrcvLevel] );
 		m_errNumType[m_unrcvLevel]:=m_errNumType[m_unrcvLevel]-1;
 	END_IF
 END_IF
@@ -475,6 +473,7 @@ IF m_errCodeUpdateFlag[m_rcvLevel] THEN
 	IF m_errNumType[m_rcvLevel]>=1 THEN
 		m_ArrayErrCodeType[m_rcvLevel]:=ArrayDeleteFrist(i_Array:=m_ArrayErrCodeType[m_rcvLevel]) ;
 		o_ErrCode[m_rcvLevel]:=m_ArrayErrCodeType[m_rcvLevel][0] ;
+		g_ArrayErrCodeTypeTest[m_rcvLevel]:=arrayFILO(i_Array:= g_ArrayErrCodeTypeTest[m_rcvLevel], i_NewData:=o_ErrCode[m_rcvLevel] );
 		m_errNumType[m_rcvLevel]:=m_errNumType[m_rcvLevel]-1;
 	END_IF
 END_IF
@@ -611,56 +610,7 @@ END_FOR
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="Fb_SafetyCheck.armSafetyCheck">
-      <LineId Id="231" Count="3" />
-      <LineId Id="236" Count="0" />
-      <LineId Id="335" Count="0" />
-      <LineId Id="239" Count="0" />
-      <LineId Id="230" Count="0" />
-      <LineId Id="371" Count="0" />
-      <LineId Id="312" Count="0" />
-      <LineId Id="244" Count="4" />
-      <LineId Id="250" Count="1" />
-      <LineId Id="243" Count="0" />
-      <LineId Id="252" Count="5" />
-      <LineId Id="259" Count="1" />
-      <LineId Id="242" Count="0" />
-      <LineId Id="240" Count="0" />
-      <LineId Id="19" Count="1" />
-      <LineId Id="18" Count="0" />
-      <LineId Id="26" Count="0" />
-      <LineId Id="25" Count="0" />
-      <LineId Id="27" Count="1" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="74" Count="5" />
-      <LineId Id="81" Count="1" />
-      <LineId Id="73" Count="0" />
-      <LineId Id="83" Count="0" />
-      <LineId Id="380" Count="0" />
-      <LineId Id="373" Count="6" />
-      <LineId Id="372" Count="0" />
-      <LineId Id="95" Count="5" />
-      <LineId Id="102" Count="1" />
-      <LineId Id="94" Count="0" />
-      <LineId Id="318" Count="5" />
-      <LineId Id="325" Count="1" />
-      <LineId Id="116" Count="0" />
-      <LineId Id="327" Count="0" />
-      <LineId Id="117" Count="4" />
-      <LineId Id="123" Count="1" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="136" Count="3" />
-      <LineId Id="141" Count="0" />
-      <LineId Id="143" Count="1" />
-      <LineId Id="135" Count="0" />
-      <LineId Id="424" Count="0" />
-      <LineId Id="157" Count="0" />
-      <LineId Id="418" Count="0" />
-      <LineId Id="421" Count="2" />
-      <LineId Id="276" Count="0" />
-      <LineId Id="434" Count="4" />
-      <LineId Id="145" Count="0" />
-      <LineId Id="441" Count="1" />
-      <LineId Id="444" Count="2" />
+      <LineId Id="691" Count="106" />
       <LineId Id="440" Count="0" />
     </LineIds>
     <LineIds Name="Fb_SafetyCheck.arrayDeleteFrist">
@@ -685,11 +635,7 @@ END_FOR
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="Fb_SafetyCheck.arrayFILO">
-      <LineId Id="14" Count="2" />
-      <LineId Id="19" Count="1" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="21" Count="0" />
-      <LineId Id="17" Count="1" />
+      <LineId Id="47" Count="7" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="Fb_SafetyCheck.cartSafetyCheck">
@@ -767,17 +713,8 @@ END_FOR
       <LineId Id="49" Count="0" />
     </LineIds>
     <LineIds Name="Fb_SafetyCheck.errCodeUpdating">
-      <LineId Id="7" Count="0" />
-      <LineId Id="6" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="38" Count="0" />
-      <LineId Id="14" Count="1" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="9" Count="1" />
-      <LineId Id="17" Count="3" />
-      <LineId Id="39" Count="0" />
-      <LineId Id="22" Count="4" />
+      <LineId Id="43" Count="19" />
+      <LineId Id="26" Count="0" />
     </LineIds>
     <LineIds Name="Fb_SafetyCheck.errFlagReset">
       <LineId Id="8" Count="0" />

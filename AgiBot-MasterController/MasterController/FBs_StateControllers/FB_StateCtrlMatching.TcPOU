@@ -72,7 +72,7 @@ END_VAR]]></Declaration>
 	matTranspose(i_masterArm.curCartPose.m_rot, invRot);
 	matMultiply(invRot, m_cmdCartPose.m_rot, rotErr);
 	rot2AngAxis(rotErr, angle=>m_rotErrAng,axis=>);
-	m_isFinished := m_timePeriod > m_matchTrajPlanner.duration AND  norm(cmdJntErr)<g_jntCtrlAngTolHigh;
+	m_isFinished := m_timePeriod > m_matchTrajPlanner.duration AND  norm(cmdJntErr)<g_jntCtrlAngTolHigh and abs(m_rotErrAng)<g_jntCtrlAngTolHigh;
 	
 	RETURN;
 END_IF
@@ -624,16 +624,7 @@ wristIK:=true;
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_StateCtrlMatching.calcCmdJntPos">
-      <LineId Id="545" Count="25" />
-      <LineId Id="669" Count="0" />
-      <LineId Id="666" Count="2" />
-      <LineId Id="665" Count="0" />
-      <LineId Id="571" Count="32" />
-      <LineId Id="670" Count="1" />
-      <LineId Id="604" Count="2" />
-      <LineId Id="672" Count="4" />
-      <LineId Id="679" Count="0" />
-      <LineId Id="607" Count="32" />
+      <LineId Id="705" Count="107" />
       <LineId Id="131" Count="0" />
     </LineIds>
     <LineIds Name="FB_StateCtrlMatching.calcJnt3Rotation">

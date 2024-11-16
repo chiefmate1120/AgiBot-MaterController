@@ -93,8 +93,7 @@ VAR_IN_OUT CONSTANT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-//Foot trigger check
+        <ST><![CDATA[//Foot trigger check
 m_electricCutLeftOn := m_electricCutLeft AND m_electricCutLeftAllow AND m_armState[1] = MasterArmState_MasterSlave ;
 m_electricCutRightOn := m_electricCutRight AND m_electricCutRightAllow AND m_armState[2] = MasterArmState_MasterSlave ;
 m_electricCoagulLeftOn := m_electricCoagulLeft AND m_electricCoagulLeftAllow AND m_armState[1] = MasterArmState_MasterSlave ;
@@ -248,8 +247,8 @@ FOR i := 1 TO 4 DO
 		m_cmdJntVel[i]:=m_jntCmdMotionDir[i]*GVL_CartJointParameters.g_jntCtrlMotionVel[i];
 		
 		// limit handle
-		IF (m_cmdJntPos[i]> GVL_CartJointParameters.g_maxJntPos[i] AND m_cmdJntVel[i] >0 ) OR 
-				(m_cmdJntPos[i]< GVL_CartJointParameters.g_minJntPos[i] AND m_cmdJntVel[i] <0 )  THEN
+		IF (m_cmdJntPos[i]> GVL_CartJointParameters.g_maxJntPos[i] - m_jntSoftwareLimit[i] AND m_cmdJntVel[i] >0 ) OR 
+				(m_cmdJntPos[i]< GVL_CartJointParameters.g_minJntPos[i] + m_jntSoftwareLimit[i] AND m_cmdJntVel[i] <0 )  THEN
 				m_cmdJntVel[i] := 0.0;
 		END_IF
 		m_cmdJntPos[i]:= m_cmdJntPos[i]+ m_cmdJntVel[i]*g_cartCtrlCycleTime;
@@ -263,9 +262,9 @@ END_FOR
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="monitorAngCalc" Id="{1b8a541f-7ef9-4562-b22e-b259ed591d2e}">
+    <Method Name="monitorAngLink2Image" Id="{3a8f7b3f-992a-495f-9594-efaf7000460f}">
       <Declaration><![CDATA[// TODO
-METHOD PROTECTED monitorAngCalc : LREAL
+METHOD PROTECTED monitorAngLink2Image : LREAL
 VAR_INPUT
 	i_linkPos:LREAL;
 END_VAR
@@ -290,7 +289,7 @@ X2:=X5-X6;
 X3:=pi-X7+X2;
 X1:=X3-X4;
 
-monitorAngCalc:=X1;
+monitorAngLink2Image:=X1;
 
 ]]></ST>
       </Implementation>
@@ -521,7 +520,6 @@ FOR i:= 1 TO 4 DO
 	END_IF
 END_FOR
 
-
 // Do not adjust during master-slave control
 IF MasterArmControl.m_masterStatus.m_armState[1] = MasterArmState_MasterSlave OR MasterArmControl.m_masterStatus.m_armState[1] = MasterArmState_Endoscope OR
 	MasterArmControl.m_masterStatus.m_armState[2] = MasterArmState_MasterSlave OR MasterArmControl.m_masterStatus.m_armState[2] = MasterArmState_Endoscope  THEN
@@ -554,11 +552,11 @@ FOR i:=1 TO 4 DO
 	m_cmdJntCurrent[i]:=m_cartJoints[i].cmdCurrent;
 END_FOR 
 
-// get monitor angle
-m_cartStatus.m_monitorAngle:= monitorAngCalc(m_curLinkPos[2]);
-
 // transfer monitor angle from link side to motor side
 m_curLinkPos[2]:= monitorAngLink2Motor(m_cartJoints[2].linkPos);
+
+// get monitor angle
+m_cartStatus.m_monitorAngle:= monitorAngLink2Image(m_cartJoints[2].linkPos);
 
 // check if cart in motion
 m_cartStatus.m_consoleInAdjust:=FALSE;
@@ -570,7 +568,7 @@ FOR i:=1 TO 4 DO
 END_FOR
 
 // check if monitor in motion
-m_cartStatus.m_monitorInAdjust:= m_cartJoints[2].isEnabled();
+m_cartStatus.m_monitorInAdjust:=m_cartJoints[2].isEnabled();
 
 // check if cart in manual adjustment
 m_cartStatus.m_consoleInManualAdjust := FALSE;
@@ -586,7 +584,6 @@ END_FOR]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterCart.eleKnifeCtrl">
-      <LineId Id="9" Count="0" />
       <LineId Id="8" Count="0" />
       <LineId Id="6" Count="0" />
       <LineId Id="10" Count="2" />
@@ -651,10 +648,10 @@ END_FOR]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterCart.manualAdjust">
-      <LineId Id="72" Count="20" />
+      <LineId Id="98" Count="20" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_MasterCart.monitorAngCalc">
+    <LineIds Name="FB_MasterCart.monitorAngLink2Image">
       <LineId Id="6" Count="17" />
       <LineId Id="5" Count="0" />
     </LineIds>
@@ -695,19 +692,12 @@ END_FOR]]></ST>
       <LineId Id="119" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterCart.updateIO">
-      <LineId Id="154" Count="69" />
+      <LineId Id="154" Count="63" />
+      <LineId Id="219" Count="4" />
       <LineId Id="91" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterCart.updateStatus">
-      <LineId Id="69" Count="15" />
-      <LineId Id="88" Count="2" />
-      <LineId Id="116" Count="1" />
-      <LineId Id="114" Count="0" />
-      <LineId Id="91" Count="8" />
-      <LineId Id="124" Count="0" />
-      <LineId Id="123" Count="0" />
-      <LineId Id="125" Count="1" />
-      <LineId Id="100" Count="6" />
+      <LineId Id="141" Count="41" />
       <LineId Id="59" Count="0" />
     </LineIds>
   </POU>

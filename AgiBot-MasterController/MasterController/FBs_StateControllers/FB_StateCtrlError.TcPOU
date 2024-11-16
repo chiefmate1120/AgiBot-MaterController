@@ -13,6 +13,27 @@ END_VAR
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
+    <Method Name="calcCmdJntPos" Id="{b11adf10-12e9-4dc8-8de8-7e614605396c}">
+      <Declaration><![CDATA[// override this function in each exact controller
+METHOD PROTECTED calcCmdJntPos : BOOL
+VAR_IN_OUT CONSTANT
+	i_slaveIdx :INT;
+	i_shoulderPose :ST_Frame;
+	i_masterArm :FB_MasterArm;
+	i_slaveStatus :ST_SlaveStatus;
+END_VAR
+
+VAR
+	i:int;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[FOR i := 1 TO g_mJntNum DO
+	IF  m_jntEnableFlag[i] = 0 THEN
+		m_cmdJntPos[i]:=i_masterArm.curJntPos[i];
+	END_IF
+END_FOR]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="init" Id="{e6a6f329-eae4-4e64-b8ba-0dd027b37a8e}">
       <Declaration><![CDATA[METHOD PUBLIC init : BOOL
 VAR_IN_OUT CONSTANT

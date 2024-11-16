@@ -34,6 +34,9 @@ VAR
 	// flag if tele-manipulated slave arm is switched
 	m_armSwitchFlag :ARRAY[1..2] OF BOOL := [2(FALSE)];
 	
+	//master arm selfcheck finshed flag
+	m_armSelfCheckFinshedFlag :ARRAY [1..2] OF BOOL;
+	
 	// flag to enter master-slave control, triggerd by pinching the gripper twice in on second
 	m_MSCtrlTriggerFlag :ARRAY[1..g_mArmNum] OF BOOL:=[FALSE, FALSE];
 	m_MSCtrlTriggerCheck :ARRAY[1..g_mArmNum] OF FB_MSCtrlTriggerCheck;
@@ -465,7 +468,11 @@ FOR i:=1 TO g_mArmNum DO
 		MasterArmState_Error:
 			// to standby
 			IF FALSE = i_masterInputDataPool.m_safetyData.m_masterErrFlag[i] THEN
-				m_nextMasterArmState[i] := MasterArmState_Standby;
+				IF m_armSelfCheckFinshedFlag[i] THEN
+					m_nextMasterArmState[i] := MasterArmState_Standby;
+				ELSE
+					m_nextMasterArmState[i]:=MasterArmState_Home;
+				END_IF
 			END_IF
 			
 		// init
@@ -475,19 +482,22 @@ FOR i:=1 TO g_mArmNum DO
 				// NOTICE: multiple cycles joints back to center during initialization
 				// 			need to reset joints encoder data again
 				m_masterArms[i].initJntPos();
+				m_armSelfCheckFinshedFlag[i] := FALSE;
 				m_nextMasterArmState[i]:=MasterArmState_Home;
 			END_IF
 
 		//home
 		MasterArmState_Home:
 			IF m_armCtrl[i].isFinished  THEN
+				m_armSelfCheckFinshedFlag[i] := TRUE;
 				m_nextMasterArmState[i]:=MasterArmState_Standby;
 			END_IF
 		
 		//standby
 		MasterArmState_Standby:
 			// to matching
-			IF SlaveArmState_InstruReady = m_instruArmState[i] AND SlaveArmState_ScopeReady = m_scopeArmState THEN
+			IF SlaveArmState_InstruReady = m_instruArmState[i] AND SlaveArmState_ScopeReady = m_scopeArmState 
+					AND i_masterInputDataPool.m_slaveStatus.m_asepticDeployCompleteFlag AND m_slaveOnLine THEN
 				m_nextMasterArmState[i]:=MasterArmState_Matching;
 			// to clutch
 			ELSIF enableClutch THEN
@@ -527,9 +537,11 @@ FOR i:=1 TO g_mArmNum DO
 			ELSIF i_masterInputDataPool.m_cartStatus.m_monitorInAdjust THEN
 				m_nextMasterArmState[i] := MasterArmState_Cart;
 			// to master-slave
-			ELSIF SlaveArmState_InstruReady = m_instruArmState[i] AND SlaveArmState_ScopeReady = m_scopeArmState AND NOT(i_masterInputDataPool.m_cartStatus.m_consoleInAdjust)
-					AND i_masterInputDataPool.m_cartStatus.m_surgonReady AND m_MSCtrlTriggerFlag[i] AND i_masterInputDataPool.m_slaveStatus.m_asepticDeployCompleteFlag THEN
+			ELSIF SlaveArmState_InstruReady = m_instruArmState[i] AND SlaveArmState_ScopeReady = m_scopeArmState 
+					AND i_masterInputDataPool.m_cartStatus.m_surgonReady AND m_MSCtrlTriggerFlag[i] AND NOT(i_masterInputDataPool.m_cartStatus.m_consoleInAdjust) THEN
 				m_nextMasterArmState[i] := MasterArmState_MasterSlave;
+			ELSIF NOT i_masterInputDataPool.m_slaveStatus.m_asepticDeployCompleteFlag THEN
+				m_nextMasterArmState[i]:=MasterArmState_Standby;
 			END_IF
 		
 		//MasterSlave
@@ -542,6 +554,9 @@ FOR i:=1 TO g_mArmNum DO
 			// to clutch
 			ELSIF enableClutch THEN
 				m_nextMasterArmState[i] := MasterArmState_Clutch; 
+			//to standby
+			ELSIF NOT m_slaveOnLine THEN
+				m_nextMasterArmState[i] := MasterArmState_Standby;
 			END_IF
 			
 		//Clutch
@@ -560,6 +575,9 @@ FOR i:=1 TO g_mArmNum DO
 			// to clutch
 			ELSIF enableClutch THEN
 				m_nextMasterArmState[i] := MasterArmState_Clutch; 
+			//to standby
+			ELSIF NOT m_slaveOnLine THEN
+				m_nextMasterArmState[i] := MasterArmState_Standby;
 			END_IF
 			
 		// Cart 
@@ -594,6 +612,7 @@ FOR i:=1 TO g_mArmNum DO
 		MasterArmState_Disable:
 			// to init
 			IF  NOT(i_masterInputDataPool.m_UIData.m_masterArmDisableFlag[i]) THEN
+				m_armSelfCheckFinshedFlag[i] := FALSE;
 				m_nextMasterArmState[i]:=MasterArmState_Init;
 			END_IF
 	END_CASE
@@ -767,8 +786,7 @@ END_FOR]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterRobot.stateMachine">
-      <LineId Id="407" Count="128" />
-      <LineId Id="539" Count="53" />
+      <LineId Id="1567" Count="198" />
       <LineId Id="225" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterRobot.updateShoulderPose">

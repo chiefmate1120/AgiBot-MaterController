@@ -50,7 +50,7 @@ END_IF
 
 FOR i:=1 TO g_mArmNum DO
 	// run gravity model
-	m_gravityModel[i].run(m_masterJointsData.m_curLinkPos[i], m_masterDynaData.m_gravity[i]);
+	m_gravityModel[i].run(m_masterJointsData.m_curJntPos[i], m_masterDynaData.m_gravity[i]);
 	
 	// run dynamic model
 	m_armDynamic[i].updateDynamic(m_masterJointsData.m_curJntPos[i]);
@@ -73,31 +73,7 @@ m_codeTime(START:=FALSE);
 ]]></ST>
     </Implementation>
     <LineIds Name="RobotDynamics">
-      <LineId Id="81" Count="0" />
-      <LineId Id="161" Count="0" />
-      <LineId Id="15" Count="1" />
-      <LineId Id="24" Count="1" />
-      <LineId Id="52" Count="0" />
-      <LineId Id="190" Count="0" />
-      <LineId Id="214" Count="0" />
-      <LineId Id="213" Count="0" />
-      <LineId Id="26" Count="0" />
-      <LineId Id="17" Count="1" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="28" Count="1" />
-      <LineId Id="199" Count="0" />
-      <LineId Id="30" Count="0" />
-      <LineId Id="194" Count="0" />
-      <LineId Id="200" Count="0" />
-      <LineId Id="196" Count="2" />
-      <LineId Id="195" Count="0" />
-      <LineId Id="201" Count="4" />
-      <LineId Id="215" Count="0" />
-      <LineId Id="248" Count="2" />
-      <LineId Id="207" Count="0" />
-      <LineId Id="27" Count="0" />
-      <LineId Id="193" Count="0" />
-      <LineId Id="83" Count="0" />
+      <LineId Id="281" Count="36" />
       <LineId Id="110" Count="0" />
     </LineIds>
   </POU>

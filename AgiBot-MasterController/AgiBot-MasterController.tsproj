@@ -1533,7 +1533,7 @@
 		</System>
 		<Plc>
 			<Project GUID="{0C182974-8910-4DEE-A0B7-B414028AF699}" Name="MasterController" PrjFilePath="MasterController\MasterController.plcproj" TmcFilePath="MasterController\MasterController.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="MasterController\MasterController.tmc" TmcHash="{7608DAE4-C8CB-B403-8EE8-B29CC4673BBF}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="MasterController\MasterController.tmc" TmcHash="{4462A0D7-721E-1EFC-3CFB-D312D6520278}">
 					<Name>MasterController Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -1954,18 +1954,6 @@
 							</OwnerB>
 							<OwnerB Name="TIPC^MasterController^MasterController Instance">
 								<Link VarA="CartControl.m_masterCart.m_jntErrFlag" TypeA="Vec4b" InOutA="0" GuidA="{D3FC0E71-E966-7642-BFEE-4268915B4346}" VarB="TaskSafetyCheck Outputs^SafetyCheck.m_safetyCheckData^m_cartErrFlag" RestoreInfo="ANotFound"/>
-							</OwnerB>
-						</OwnerA>
-					</UnrestoredVarLinks>
-					<UnrestoredVarLinks ImportTime="2024-11-13T12:08:30">
-						<OwnerA Name="InputDst" Prefix="TIPC^MasterController^MasterController Instance" Type="1">
-							<OwnerB Name="TIPC^MasterController^MasterController Instance">
-								<Link VarA="MasterArmControl.m_masterInputDataPool.m_cartStatus" TypeA="ST_CartStatus" InOutA="0" GuidA="{0BD048C8-F98A-BAAD-1403-26799A8FFD1A}" VarB="TaskCartControl Outputs^CartControl.m_cartStatus" RestoreInfo="TypeChanged" IdA="2428"/>
-							</OwnerB>
-						</OwnerA>
-						<OwnerA Name="OutputSrc" Prefix="TIPC^MasterController^MasterController Instance" Type="2">
-							<OwnerB Name="TIPC^MasterController^MasterController Instance">
-								<Link VarA="CartControl.m_cartStatus" TypeA="ST_CartStatus" InOutA="1" GuidA="{0BD048C8-F98A-BAAD-1403-26799A8FFD1A}" VarB="TaskSafetyCheck Inputs^SafetyCheck.m_cartStatus" RestoreInfo="TypeChanged" IdA="2447"/>
 							</OwnerB>
 						</OwnerA>
 					</UnrestoredVarLinks>

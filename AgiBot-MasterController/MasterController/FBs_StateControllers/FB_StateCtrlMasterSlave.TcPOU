@@ -186,11 +186,7 @@ VAR_IN_OUT CONSTANT
 END_VAR
 
 VAR 
-	nullspaceMat :Mat7d;
-	ctrlTrq : Vec7d;
-	boundaryTrq :Vec7d;
-	withinBoundary :BOOL;
-	i :INT;
+	
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -199,7 +195,9 @@ END_VAR
 	calcCmdJntTrq_USKnife(i_slaveIdx,i_shoulderPose,i_masterArm,i_slaveStatus);
 ELSE
 	calcCmdJntTrq_BasicInstru(i_slaveIdx,i_shoulderPose,i_masterArm,i_slaveStatus);
-END_IF]]></ST>
+END_IF
+
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="calcCmdJntTrq_BasicInstru" Id="{924c67b8-8dc8-4b14-a8ff-535af80c10ba}">
@@ -367,7 +365,7 @@ copyCmds(r_masterArmCtrlCmd);
       <LineId Id="131" Count="0" />
     </LineIds>
     <LineIds Name="FB_StateCtrlMasterSlave.calcCmdJntTrq">
-      <LineId Id="223" Count="4" />
+      <LineId Id="258" Count="6" />
       <LineId Id="13" Count="0" />
     </LineIds>
     <LineIds Name="FB_StateCtrlMasterSlave.calcCmdJntTrq_BasicInstru">
