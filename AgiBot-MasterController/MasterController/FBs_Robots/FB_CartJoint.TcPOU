@@ -73,10 +73,10 @@ m_curTrqLpf.init(1, g_curJntTrqLpfCutoffFreq, g_cartCtrlFreq);
 //inertia compensation---1106
 //m_jntVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_cartCtrlFreq);
 //m_linkVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_cartCtrlFreq);
-m_jntVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_armCtrlFreq/gvl.g_velCalCycle);
-m_linkVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_cartCtrlFreq/gvl.g_velCalCycle);
-m_jntAccLpf.init(1, g_curJntVelLpfCutoffFreq, g_armCtrlFreq/gvl.g_accCalCycle); 
-m_jntAccLpfLink.init(1, g_curJntVelLpfCutoffFreq*0.6, g_armCtrlFreq/gvl.g_accCalCycle); 
+m_jntVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_armCtrlFreq/GVL_Inertia.g_velCalCycle);
+m_linkVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_cartCtrlFreq/GVL_Inertia.g_velCalCycle);
+m_jntAccLpf.init(1, g_curJntVelLpfCutoffFreq, g_armCtrlFreq/GVL_Inertia.g_accCalCycle); 
+m_jntAccLpfLink.init(1, g_curJntVelLpfCutoffFreq*0.6, g_armCtrlFreq/GVL_Inertia.g_accCalCycle); 
 m_velCycle:=0;
 m_accCycle:=0;
 

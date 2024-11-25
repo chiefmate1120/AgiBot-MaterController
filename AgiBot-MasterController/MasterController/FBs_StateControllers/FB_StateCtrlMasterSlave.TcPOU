@@ -246,11 +246,11 @@ END_FOR
 *)
 
 //inertia compensation---1106
-IF (gvl.if_addInertia[i_masterArm.armIdx]=TRUE) THEN
+IF (GVL_Inertia.g_ifAddInertia[i_masterArm.armIdx]=TRUE) THEN
 	// add friction compensation
 	FOR i:=1 TO g_mJntNum DO 
-		inertiaTrq:=i_masterArm.curJntInertiaTrq[i]*gvl.m_armRatio[i_masterArm.armIdx]*gvl.m_jntRatio[i_masterArm.armIdx,i];
-		inertiaTrq:=inertiaTrq*gvl.g_jntVelFactor[i_masterArm.armIdx,i]*gvl.g_jntAccFactor[i_masterArm.armIdx,i];
+		inertiaTrq:=i_masterArm.curJntInertiaTrq[i]*GVL_Inertia.g_armRatio[i_masterArm.armIdx]*GVL_Inertia.g_jntRatio[i_masterArm.armIdx,i];
+		inertiaTrq:=inertiaTrq*GVL_Inertia.g_jntVelFactor[i_masterArm.armIdx,i]*GVL_Inertia.g_jntAccFactor[i_masterArm.armIdx,i];
 		m_cmdJntTrq[i] := m_cmdJntTrq[i] +m_frictionCompScale * i_masterArm.jntFriction[i] + m_boundaryTrq[i]+inertiaTrq;
 	END_FOR
 ELSE

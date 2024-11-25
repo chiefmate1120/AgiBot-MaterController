@@ -318,16 +318,16 @@ END_VAR
         <Implementation>
           <ST><![CDATA[
 //cmdJntPos REF= m_cmdJntPos;---inertia compensation---1106
-IF (gvl.m_InertiaSelect[m_armIdx]=1) THEN
+IF (GVL_Inertia.g_InertiaSelect[m_armIdx]=1) THEN
 	curJntInertiaTrq REF=m_jntInertiaTrq;
 	
-ELSIF(gvl.m_InertiaSelect[m_armIdx]=2) THEN
+ELSIF(GVL_Inertia.g_InertiaSelect[m_armIdx]=2) THEN
 	curJntInertiaTrq REF=m_linkInertiaTrq;
 	
-ELSIF(gvl.m_InertiaSelect[m_armIdx]=3) THEN
+ELSIF(GVL_Inertia.g_InertiaSelect[m_armIdx]=3) THEN
 	curJntInertiaTrq REF=m_jntTorForAcc;
 	
-ELSIF(gvl.m_InertiaSelect[m_armIdx]=4) THEN
+ELSIF(GVL_Inertia.g_InertiaSelect[m_armIdx]=4) THEN
 	curJntInertiaTrq REF=m_jntTorForAccByDiff;
 END_IF
 ]]></ST>
@@ -580,8 +580,8 @@ END_FOR
 
 //spatial acceleration init---inertia compensation---1106
 FOR i:=1 TO 6 DO 
-	m_spatialAccLpf[i].init(1, g_curJntVelLpfCutoffFreq*0.2, g_armCtrlFreq/gvl.g_accCalCycle);
-	m_spatialAccLpf_2[i].init(1, g_curJntVelLpfCutoffFreq*0.2, g_armCtrlFreq/gvl.g_accCalCycle);
+	m_spatialAccLpf[i].init(1, g_curJntVelLpfCutoffFreq*0.2, g_armCtrlFreq/GVL_Inertia.g_accCalCycle);
+	m_spatialAccLpf_2[i].init(1, g_curJntVelLpfCutoffFreq*0.2, g_armCtrlFreq/GVL_Inertia.g_accCalCycle);
 END_FOR]]></ST>
       </Implementation>
     </Method>
@@ -1041,7 +1041,7 @@ matMultiVec(m_jntMassMat,m_curLinkAcc,m_linkInertiaTrq);
 IF (m_joints[1].m_accCycle=0) THEN
 	//taking the derivative of the Jacobian matrix
 	matSub(m_linkJaco,m_linkJacoLast,tmpMat67);
-	factor:=1.0/(gvl.g_accCalCycle*g_armCtrlCycleTime);
+	factor:=1.0/(GVL_Inertia.g_accCalCycle*g_armCtrlCycleTime);
 	matMultiNum(tmpMat67,factor,JacoDot);
 	m_linkJacoLast:=m_linkJaco;
 	
@@ -1060,7 +1060,7 @@ IF (m_joints[1].m_accCycle=0) THEN
 	
 	//taking the derivative of spatial velocity
 	vecSub(m_curCartLinkTwist,m_curCartLinkTwistLast,curCartLinkTwistDiff);
-	vecMultiNum(curCartLinkTwistDiff,1.0/(gvl.g_accCalCycle*g_armCtrlCycleTime),m_spaceAccByDiff);
+	vecMultiNum(curCartLinkTwistDiff,1.0/(GVL_Inertia.g_accCalCycle*g_armCtrlCycleTime),m_spaceAccByDiff);
 	m_curCartLinkTwistLast:=m_curCartLinkTwist;
 	FOR i:=1 TO 6 BY 1 DO
 		m_spaceAccByDiff[i]:=m_spatialAccLpf_2[i].run(m_spaceAccByDiff[i]);
@@ -1074,8 +1074,8 @@ END_IF
 
 //Inertia force scaling factor
 FOR i:=1 TO g_mJntNum DO
-	gvl.g_jntVelFactor[m_armIdx,i]:=LIMIT(0,ABS(m_curLinkVel[i]/(gvl.g_jntVelLimit[m_armIdx,i]*gvl.g_jntVelLimitScaler[m_armIdx])),1);
-	gvl.g_jntAccFactor[m_armIdx,i]:=LIMIT(0,ABS(m_curLinkAcc[i]/gvl.g_jntAccLimit[m_armIdx,i]*gvl.g_jntAccLimitScaler[m_armIdx]),1);
+	GVL_Inertia.g_jntVelFactor[m_armIdx,i]:=LIMIT(0,ABS(m_curLinkVel[i]/(GVL_Inertia.g_jntVelLimit[m_armIdx,i]*GVL_Inertia.g_jntVelLimitScaler[m_armIdx])),1);
+	GVL_Inertia.g_jntAccFactor[m_armIdx,i]:=LIMIT(0,ABS(m_curLinkAcc[i]/GVL_Inertia.g_jntAccLimit[m_armIdx,i]*GVL_Inertia.g_jntAccLimitScaler[m_armIdx]),1);
 END_FOR
 
 

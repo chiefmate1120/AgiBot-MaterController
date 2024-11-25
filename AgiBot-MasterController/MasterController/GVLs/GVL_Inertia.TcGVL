@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="GVL" Id="{5649f54d-2807-4eb0-8b14-65e6215c3fd9}">
+  <GVL Name="GVL_Inertia" Id="{5649f54d-2807-4eb0-8b14-65e6215c3fd9}">
     <Declaration><![CDATA[{attribute 'qualified_only'}
 VAR_GLOBAL
 	//if add inertia compensation
-	if_addInertia:ARRAY[1..2] OF BOOL;	
+	g_ifAddInertia:ARRAY[1..2] OF BOOL;	
 	
 	//joint inertia torque scale factor	
-	m_jntRatio :ARRAY[1..2,1..7] OF LREAL:=[0.28,0.7,0.56,0,0.7,0.4,0,    0.28,0.7,0.56,0,0.5,0.3,0];
-	m_armRatio:ARRAY[1..2] OF LREAL:=[1,1];
+	g_jntRatio :ARRAY[1..2,1..7] OF LREAL:=[0.28,0.7,0.56,0,0.7,0.4,0,    0.28,0.7,0.56,0,0.5,0.3,0];
+	g_armRatio:ARRAY[1..2] OF LREAL:=[1,1];
 	
 	//Inertia force calculation method selection
-	m_InertiaSelect:ARRAY[1..2] OF INT:=[2,2]; //3
+	g_InertiaSelect:ARRAY[1..2] OF INT:=[2,2]; //3
 	
 	//Velocity and acceleration calculation cycle
 	g_velCalCycle:INT:=4;
