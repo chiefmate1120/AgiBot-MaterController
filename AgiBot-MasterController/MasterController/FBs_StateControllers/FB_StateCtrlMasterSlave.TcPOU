@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_StateCtrlMasterSlave" Id="{5b96f309-da76-444d-a9fb-2d4321895cd7}" SpecialFunc="None">
     <Declaration><![CDATA[// Brief: Master Arm MasterSlave controller
 FUNCTION_BLOCK PUBLIC FB_StateCtrlMasterSlave EXTENDS FB_MasterArmCtrlBase
@@ -217,6 +217,7 @@ VAR
 	boundaryTrq :Vec7d;
 	withinBoundary :BOOL;
 	i :INT;
+	inertiaTrq:LREAL;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -237,10 +238,26 @@ ELSE
 	m_cmdJntTrq := ctrlTrq;
 END_IF
 
+(*
 // add friction compensation
 FOR i:=1 TO g_mJntNum DO 
 	m_cmdJntTrq[i] := m_cmdJntTrq[i] +m_frictionCompScale * i_masterArm.jntFriction[i] + m_boundaryTrq[i];
 END_FOR
+*)
+
+//inertia compensation---1106
+IF (gvl.if_addInertia[i_masterArm.armIdx]=TRUE) THEN
+	// add friction compensation
+	FOR i:=1 TO g_mJntNum DO 
+		inertiaTrq:=i_masterArm.curJntInertiaTrq[i]*gvl.m_armRatio[i_masterArm.armIdx]*gvl.m_jntRatio[i_masterArm.armIdx,i];
+		inertiaTrq:=inertiaTrq*gvl.g_jntVelFactor[i_masterArm.armIdx,i]*gvl.g_jntAccFactor[i_masterArm.armIdx,i];
+		m_cmdJntTrq[i] := m_cmdJntTrq[i] +m_frictionCompScale * i_masterArm.jntFriction[i] + m_boundaryTrq[i]+inertiaTrq;
+	END_FOR
+ELSE
+	FOR i:=1 TO g_mJntNum DO 
+		m_cmdJntTrq[i] := m_cmdJntTrq[i] +m_frictionCompScale * i_masterArm.jntFriction[i] + m_boundaryTrq[i];
+	END_FOR
+END_IF
 ]]></ST>
       </Implementation>
     </Method>
@@ -382,7 +399,8 @@ copyCmds(r_masterArmCtrlCmd);
       <LineId Id="58" Count="0" />
       <LineId Id="55" Count="2" />
       <LineId Id="35" Count="0" />
-      <LineId Id="182" Count="3" />
+      <LineId Id="223" Count="18" />
+      <LineId Id="185" Count="0" />
       <LineId Id="13" Count="0" />
     </LineIds>
     <LineIds Name="FB_StateCtrlMasterSlave.calcCmdJntTrq_USKnife">
