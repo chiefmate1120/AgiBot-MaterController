@@ -68,20 +68,13 @@ m_cmdJntTrq :=0.0;
 m_cmdCurrent := 0.0;
 
 // filter init
-//m_jntVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_armCtrlFreq);
-//m_linkVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_armCtrlFreq);
+m_jntVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_armCtrlFreq);
+m_linkVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_armCtrlFreq);
+m_jntAccLpf.init(1, g_curJntVelLpfCutoffFreq*0.2, g_armCtrlFreq); 
+m_linkAccLpf.init(1, g_curJntVelLpfCutoffFreq*0.2, g_armCtrlFreq); 
 m_cmdTrqLpf.init(1, g_cmdJntTrqLpfCutoffFreq, g_armCtrlFreq);
 m_curTrqLpf.init(1, g_curJntTrqLpfCutoffFreq, g_armCtrlFreq);
 
-//inertia compensation---1106
-m_jntVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_armCtrlFreq/GVL_Inertia.g_velCalCycle);
-m_linkVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_armCtrlFreq/GVL_Inertia.g_velCalCycle);
-m_jntAccLpf.init(1, g_curJntVelLpfCutoffFreq*0.2, g_armCtrlFreq/GVL_Inertia.g_accCalCycle); 
-m_jntAccLpfLink.init(1, g_curJntVelLpfCutoffFreq*0.2, g_armCtrlFreq/GVL_Inertia.g_accCalCycle); 
-m_velCycle:=0;
-m_accCycle:=0;
-m_velCycleLink:=0;
-m_accCycleLink:=0;
 
 // driver init value
 m_motorOutputs.m_controlWord:=DriverCtrlWord_INIT;
@@ -94,7 +87,11 @@ m_motorOutputs.m_cmdMotorEncoder:=m_motorInputs.m_motorEncoder;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_ArmJoint.init">
-      <LineId Id="195" Count="65" />
+      <LineId Id="195" Count="48" />
+      <LineId Id="268" Count="0" />
+      <LineId Id="267" Count="0" />
+      <LineId Id="244" Count="2" />
+      <LineId Id="256" Count="4" />
       <LineId Id="39" Count="0" />
     </LineIds>
   </POU>

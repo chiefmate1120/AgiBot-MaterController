@@ -1559,6 +1559,11 @@
 							<Type GUID="{EFC31606-5620-EF9E-1B71-A4D1735F6933}">ST_MasterDynaData</Type>
 						</Var>
 						<Var>
+							<Name>SafetyCheck.m_stopButton</Name>
+							<Comment><![CDATA[stop botton]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
 							<Name>MasterArmControl.m_masterRobot.m_masterArms[1].m_gripHallSensorIO</Name>
 							<Comment><![CDATA[ grip angle calculator]]></Comment>
 							<Type>UDINT</Type>
@@ -1647,11 +1652,6 @@
 							<Name>MasterArmControl.m_masterRobot.m_masterArms[2].m_joints[7].m_motorInputs</Name>
 							<Comment><![CDATA[ motor IO]]></Comment>
 							<Type GUID="{2976164F-36D9-360C-E3C9-0E373EED87DE}">ST_MotorInputs</Type>
-						</Var>
-						<Var>
-							<Name>SafetyCheck.m_stopButton</Name>
-							<Comment><![CDATA[stop botton]]></Comment>
-							<Type>BOOL</Type>
 						</Var>
 					</Vars>
 					<Vars VarGrpType="2" AreaNo="1">
@@ -1825,6 +1825,21 @@
 					<Vars VarGrpType="2" ContextId="2" AreaNo="33">
 						<Name>TaskCartControl Outputs</Name>
 						<Var>
+							<Name>CartControl.m_cartStatus</Name>
+							<Comment><![CDATA[ Output cart status]]></Comment>
+							<Type GUID="{32049157-EE4E-66EF-B953-F74D5CE5F3CA}">ST_CartStatus</Type>
+						</Var>
+						<Var>
+							<Name>CartControl.m_cartJointData</Name>
+							<Comment><![CDATA[ Cart  joint data]]></Comment>
+							<Type GUID="{B09070B0-7D71-A6A7-E97E-969B283AF690}">ST_CartJointData</Type>
+						</Var>
+						<Var>
+							<Name>SafetyCheck.m_safetyCheckData</Name>
+							<Comment><![CDATA[ error check result]]></Comment>
+							<Type GUID="{7E2B5564-187F-D309-7B6F-4A31D33DF718}">ST_SafetyData</Type>
+						</Var>
+						<Var>
 							<Name>CartControl.m_masterCart.m_elecKnifeCtrlWord</Name>
 							<Type>DINT</Type>
 						</Var>
@@ -1843,21 +1858,6 @@
 						<Var>
 							<Name>CartControl.m_masterCart.m_cartJoints[4].m_motorOutputs</Name>
 							<Type GUID="{4CE39040-C42E-0F49-A5E0-4BD6D1293DCD}">ST_MotorOutputs</Type>
-						</Var>
-						<Var>
-							<Name>CartControl.m_cartStatus</Name>
-							<Comment><![CDATA[ Output cart status]]></Comment>
-							<Type GUID="{32049157-EE4E-66EF-B953-F74D5CE5F3CA}">ST_CartStatus</Type>
-						</Var>
-						<Var>
-							<Name>CartControl.m_cartJointData</Name>
-							<Comment><![CDATA[ Cart  joint data]]></Comment>
-							<Type GUID="{B09070B0-7D71-A6A7-E97E-969B283AF690}">ST_CartJointData</Type>
-						</Var>
-						<Var>
-							<Name>SafetyCheck.m_safetyCheckData</Name>
-							<Comment><![CDATA[ error check result]]></Comment>
-							<Type GUID="{7E2B5564-187F-D309-7B6F-4A31D33DF718}">ST_SafetyData</Type>
 						</Var>
 					</Vars>
 					<Vars VarGrpType="1" ContextId="3" AreaNo="48">

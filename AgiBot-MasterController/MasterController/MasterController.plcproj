@@ -316,6 +316,9 @@
     <Compile Include="FBs_BasicControllers\FB_RedunJntControl.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="FBs_Observer\FB_JntInertia.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="FBs_Observer\FB_JntObserver.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -481,10 +484,6 @@
       <LinkAlways>true</LinkAlways>
     </Compile>
     <Compile Include="GVLs\Configs\Robot6\GVL_CartJointCaliData_6.TcGVL">
-      <SubType>Code</SubType>
-      <LinkAlways>true</LinkAlways>
-    </Compile>
-    <Compile Include="GVLs\GVL_Inertia.TcGVL">
       <SubType>Code</SubType>
       <LinkAlways>true</LinkAlways>
     </Compile>

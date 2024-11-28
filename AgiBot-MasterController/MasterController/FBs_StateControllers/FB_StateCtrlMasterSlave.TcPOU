@@ -238,26 +238,10 @@ ELSE
 	m_cmdJntTrq := ctrlTrq;
 END_IF
 
-(*
 // add friction compensation
 FOR i:=1 TO g_mJntNum DO 
-	m_cmdJntTrq[i] := m_cmdJntTrq[i] +m_frictionCompScale * i_masterArm.jntFriction[i] + m_boundaryTrq[i];
+	m_cmdJntTrq[i] := m_cmdJntTrq[i] +m_frictionCompScale * i_masterArm.jntFriction[i] + m_boundaryTrq[i]+i_masterArm.jntExtTrq[i];
 END_FOR
-*)
-
-//inertia compensation---1106
-IF (GVL_Inertia.g_ifAddInertia[i_masterArm.armIdx]=TRUE) THEN
-	// add friction compensation
-	FOR i:=1 TO g_mJntNum DO 
-		inertiaTrq:=i_masterArm.curJntInertiaTrq[i]*GVL_Inertia.g_armRatio[i_masterArm.armIdx]*GVL_Inertia.g_jntRatio[i_masterArm.armIdx,i];
-		inertiaTrq:=inertiaTrq*GVL_Inertia.g_jntVelFactor[i_masterArm.armIdx,i]*GVL_Inertia.g_jntAccFactor[i_masterArm.armIdx,i];
-		m_cmdJntTrq[i] := m_cmdJntTrq[i] +m_frictionCompScale * i_masterArm.jntFriction[i] + m_boundaryTrq[i]+inertiaTrq;
-	END_FOR
-ELSE
-	FOR i:=1 TO g_mJntNum DO 
-		m_cmdJntTrq[i] := m_cmdJntTrq[i] +m_frictionCompScale * i_masterArm.jntFriction[i] + m_boundaryTrq[i];
-	END_FOR
-END_IF
 ]]></ST>
       </Implementation>
     </Method>
@@ -399,8 +383,7 @@ copyCmds(r_masterArmCtrlCmd);
       <LineId Id="58" Count="0" />
       <LineId Id="55" Count="2" />
       <LineId Id="35" Count="0" />
-      <LineId Id="223" Count="18" />
-      <LineId Id="185" Count="0" />
+      <LineId Id="224" Count="3" />
       <LineId Id="13" Count="0" />
     </LineIds>
     <LineIds Name="FB_StateCtrlMasterSlave.calcCmdJntTrq_USKnife">

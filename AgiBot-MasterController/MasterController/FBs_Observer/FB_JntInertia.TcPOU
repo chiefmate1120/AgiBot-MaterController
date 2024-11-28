@@ -1,0 +1,500 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="FB_JntInertia" Id="{4b310101-d221-4831-b278-d23864de0fd1}" SpecialFunc="None">
+    <Declaration><![CDATA[//Calculation of joint inertia torque
+FUNCTION_BLOCK FB_JntInertia
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	//arm id
+	m_armIdx:INT;
+	
+	// cycle time
+	m_cycleTime :LREAL;
+	
+	// velocity and acceleration filter
+	m_jntVelLpf :ARRAY[1..g_mJntNum] OF FB_LowPassFilter;	
+	m_jntAccLpf :ARRAY[1..g_mJntNum] OF FB_LowPassFilter;
+	m_linkVelLpf :ARRAY[1..g_mJntNum] OF FB_LowPassFilter;
+	m_linkAccLpf :ARRAY[1..g_mJntNum] OF FB_LowPassFilter;
+	
+	//joint position
+	m_curJntPos,m_lastJntPos:Vec7d;
+	m_curLinkPos,m_lastLinkPos:Vec7d;
+	
+	//joint velocity
+	m_curJntVel,m_lastJntVel :Vec7d;
+	m_curLinkVel,m_lastLinkVel :Vec7d;
+	
+	//joint acceleration
+	m_curJntAcc :Vec7d;
+	m_curLinkAcc:Vec7d;	
+	
+	//inertia compensation
+	m_jntInertiaTrq:Vec7d;
+	m_linkInertiaTrq:Vec7d;	
+	
+	//Calculate space velocity related variables
+	m_linkJacoLast : Mat67; //last link jacobian matrix
+	m_spaceAcc:Vec6d; //space acceleration
+	m_spaceAccByDiff:Vec6d;
+	m_curCartLinkTwist :Vec6d;
+	m_curCartLinkTwistLast :Vec6d;	
+	
+	//Spatial force related variables
+	m_spatialForce:Vec6d;
+	m_spatialForceByAccDiff:Vec6d;
+	m_jntTorForAcc:Vec7d;
+	m_jntTorForAccByDiff:Vec7d;
+	
+	//Spatial acceleration filter
+	m_spatialAccLpf :ARRAY[1..6] OF FB_LowPassFilter;
+	m_spatialAccLpf_2 :ARRAY[1..6] OF FB_LowPassFilter;
+	
+	//joint mass matrix
+	m_jntMassMat : Mat7d;
+	
+	//space mass matirx
+	m_lambda :Mat6d;
+	
+	// arm jacobian	
+	m_linkJaco : Mat67;
+	
+	//if add inertia compensation
+	m_ifAddInertia:ARRAY[1..2] OF BOOL;	
+	
+	//joint inertia torque scale factor	
+	m_jntRatio :ARRAY[1..2,1..7] OF LREAL:=[0.28,0.7,0.56,0,0.7,0.4,0,    0.28,0.7,0.56,0,0.5,0.3,0];
+	m_armRatio:ARRAY[1..2] OF LREAL:=[1,1];
+	
+	//Inertia force calculation method selection
+	m_InertiaSelect:ARRAY[1..2] OF INT:=[2,2]; //3
+	
+	//joint velocity limit for inertia torque compensation	
+	m_jntVelLimit:ARRAY[1..2,1..7] OF LREAL:=[0.1,0.1,0.1,0.1,0.1,0.1,0.1,    0.1,0.1,0.1,0.1,0.1,0.1,0.1];
+	m_jntAccLimit:ARRAY[1..2,1..7] OF LREAL:=[1,1,1,1,1,1,1,    1,1,1,1,1,1,1];
+	
+	//Calculate scaling factor related variables
+	m_jntVelLimitScaler:ARRAY[1..2] OF LREAL:=[1,1];
+	m_jntAccLimitScaler:ARRAY[1..2] OF LREAL:=[1,1];
+	m_jntVelFactor:ARRAY[1..2,1..7] OF LREAL;
+	m_jntAccFactor:ARRAY[1..2,1..7] OF LREAL;
+	
+	spaceAccPart1,spaceAccPart2:Vec6d;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="calcJaco" Id="{3815e210-4b13-4f70-9836-a782e94b1742}">
+      <Declaration><![CDATA[METHOD PROTECTED calcJaco : BOOL
+VAR_IN_OUT CONSTANT
+	i_jntPos :ARRAY[1..g_mJntNum] OF LREAL;
+END_VAR
+VAR_IN_OUT
+	r_jaco :ARRAY[1..g_cartDofs, 1..g_mJntNum] OF LREAL;
+END_VAR
+VAR_INPUT
+END_VAR
+
+VAR
+	q1,q2, q3, q4, q5, q6, q7 :LREAL;
+	d1,d4,a3,a4 :LREAL;
+	c1,c2,c3,c4,c5,c6,c7 :LREAL;
+	s1,s2,s3,s4,s5,s6,s7 :LREAL;
+	c23, s23 :LREAL;
+	j:INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// !Convert active joint position to DH model for kinematic calculation
+q1:=i_jntPos[1];  
+q2:=i_jntPos[2];  
+q3:=i_jntPos[3]-i_jntPos[2];  //q3=q8-q2
+q4:=i_jntPos[4]+i_jntPos[3]-i_jntPos[2]-pi/2;//q4DH=q4motor+q8-q2-90;  
+q5:=i_jntPos[5];  
+q6:=i_jntPos[6];  
+q7:=i_jntPos[7];  
+d1:=g_d1;
+d4:=g_d4;
+a3:=g_a3;
+a4:=g_a4;
+c1:=COS(q1);
+c2:=COS(q2);
+c3:=COS(q3);
+c4:=COS(q4);
+c5:=COS(q5);
+c6:=COS(q6);
+c7:=COS(q7);
+s1:=SIN(q1);
+s2:=SIN(q2);
+s3:=SIN(q3);
+s4:=SIN(q4);
+s5:=SIN(q5);
+s6:=SIN(q6);
+s7:=SIN(q7);
+c23:=COS(q2+q3);
+s23:=SIN(q2+q3);
+
+// jacobian with DH joints
+r_jaco[1,1]:=-s1*(c2*(a3 + a4*c3 - d4*s3) - s2*(d4*c3 + a4*s3)) ;
+r_jaco[1,2]:=-c1*(s2*(a3 + a4*c3 - d4*s3) + c2*(d4*c3 + a4*s3)) ;
+r_jaco[1,3]:=-c1*(d4*c23 + a4*s23) ;
+r_jaco[1,4]:=0 ;
+r_jaco[1,5]:=0 ;
+r_jaco[1,6]:=0 ;
+r_jaco[1,7]:=0;
+ 
+r_jaco[2,1]:=c1*(c2*(a3 + a4*c3 - d4*s3) - s2*(d4*c3 + a4*s3)); 
+r_jaco[2,2]:=-s1*(s2*(a3 + a4*c3 - d4*s3) + c2*(d4*c3 + a4*s3)); 
+r_jaco[2,3]:=-s1*(d4*c23 + a4*s23); 
+r_jaco[2,4]:=0; 
+r_jaco[2,5]:=0; 
+r_jaco[2,6]:=0; 
+r_jaco[2,7]:=0;
+
+ 
+r_jaco[3,1]:=0 ;
+r_jaco[3,2]:=- c1*(c1*c2*(a3 + a4*c3 - d4*s3) - c1*s2*(d4*c3 + a4*s3)) - s1*(c2*s1*(a3 + a4*c3 - d4*s3) - s1*s2*(d4*c3 + a4*s3));
+r_jaco[3,3]:=- c1*(a4*c23*c1 - d4*s23*c1) - s1*(a4*c23*s1 - d4*s23*s1);
+r_jaco[3,4]:=0;
+r_jaco[3,5]:=0;
+r_jaco[3,6]:=0 ;
+r_jaco[3,7]:=0 ;
+
+r_jaco[4,1]:=0 ;
+r_jaco[4,2]:=-s1 ;
+r_jaco[4,3]:=-s1 ;
+r_jaco[4,4]:=-s23*c1 ;
+r_jaco[4,5]:=c23*c1*s4 - c4*s1 ;
+r_jaco[4,6]:=- s5*(s1*s4 + c23*c1*c4) - s23*c1*c5 ;
+r_jaco[4,7]:=s6*(c5*(s1*s4 + c4*(c1*c2*c3 - c1*s2*s3)) - s5*(c1*c2*s3 + c1*c3*s2)) - c6*(c4*s1 - s4*(c1*c2*c3 - c1*s2*s3));
+ 
+r_jaco[5,1]:=0; 
+r_jaco[5,2]:=c1; 
+r_jaco[5,3]:=c1; 
+r_jaco[5,4]:=-s23*s1; 
+r_jaco[5,5]:=c1*c4 + c23*s1*s4; 
+r_jaco[5,6]:=s5*(c1*s4 - c23*c4*s1) - s23*c5*s1; 
+r_jaco[5,7]:=c6*(c1*c4 - s4*(s1*s2*s3 - c2*c3*s1)) - s6*(c5*(c1*s4 + c4*(s1*s2*s3 - c2*c3*s1)) + s5*(c2*s1*s3 + c3*s1*s2));
+
+r_jaco[6,1]:=1 ;
+r_jaco[6,2]:=0 ;
+r_jaco[6,3]:=0 ;
+r_jaco[6,4]:=-c23 ;
+r_jaco[6,5]:=-s23*s4 ;
+r_jaco[6,6]:=s23*c4*s5 - c23*c5 ;
+r_jaco[6,7]:=- s6*(c23*s5 + s23*c4*c5) - s23*c6*s4;
+
+// jacobian with active joints
+// jaco_DH*qdot_DH = jaco_DH * (A * qdot)= jaco * qdot
+// A =[ 1  0 0 0 0 0 0
+//		0  1 0 0 0 0 0
+//		0 -1 1 0 0 0 0
+//		0 -1 1 1 0 0 0
+//		0 0  0 0 1 0 0
+//      0 0  0 0 0 1 0
+// 		0 0  0 0 0 0 1]
+ FOR j:=1 TO 6 DO 
+	 r_jaco[j,2]:=r_jaco[j,2]-r_jaco[j,3]-r_jaco[j,4];
+	 r_jaco[j,3]:=r_jaco[j,3]+r_jaco[j,4];
+ END_FOR
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="init" Id="{b8ab17b8-9c5a-443c-bff1-4639c227fcd7}">
+      <Declaration><![CDATA[METHOD init : BOOL
+VAR_INPUT
+	i_armIdx :INT;
+END_VAR
+
+VAR
+	i:INT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//arm id
+m_armIdx:=i_armIdx;
+
+//cycle time
+m_cycleTime:=g_armDynamicCycleTime;
+
+//filter
+FOR i:=1 TO g_mJntNum BY 1 DO
+	//velocity filter
+	m_jntVelLpf[i].init(1, g_curJntVelLpfCutoffFreq, g_armDynamicFreq);
+	m_linkVelLpf[i].init(1, g_curJntVelLpfCutoffFreq, g_armDynamicFreq);
+	
+	//acceleration filter
+	m_jntAccLpf[i].init(1, g_curJntVelLpfCutoffFreq*0.2, g_armDynamicFreq); 
+	m_linkAccLpf[i].init(1, g_curJntVelLpfCutoffFreq*0.2, g_armDynamicFreq); 
+END_FOR
+
+//spatial acceleration init
+FOR i:=1 TO 6 DO
+	m_spatialAccLpf[i].init(1, g_curJntVelLpfCutoffFreq*0.2, g_armDynamicFreq);
+	m_spatialAccLpf_2[i].init(1, g_curJntVelLpfCutoffFreq*0.2, g_armDynamicFreq);
+END_FOR]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="jntInertiaCal" Id="{bcc71ea0-43d9-431e-a411-ed406d2bc9b8}">
+      <Declaration><![CDATA[METHOD jntInertiaCal : Vec7d
+VAR_INPUT
+	i_jntPos : Vec7d;
+	i_linkPos : Vec7d;
+	i_masterDynaData : ST_MasterDynaData;
+END_VAR
+
+VAR_OUTPUT
+	//
+END_VAR
+
+VAR
+	i,j,k:INT;
+	tmpMat67 : Mat67;
+	JacoDot:Mat67;
+	JacoT:Mat76;
+	
+	curCartLinkTwistDiff :Vec6d;
+	factor:LREAL;
+	inertiaTrq:LREAL;
+	inertiaTrqVec:Vec7d;
+	o_inertiaTrq : Vec7d;
+	
+	//test
+	JacoDotLimit:LREAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//calculating joint velocity and acceleration
+jntVelAccCal(i_jntPos:= i_jntPos, i_linkPos:= i_linkPos);
+
+
+//joint inertia torque
+m_jntMassMat:=i_masterDynaData.m_massMat[m_armIdx];
+matMultiVec(m_jntMassMat,m_curJntAcc,m_jntInertiaTrq);
+//m_curLinkAcc[4]:=0;
+matMultiVec(m_jntMassMat,m_curLinkAcc,m_linkInertiaTrq);
+
+
+//taking the derivative of the Jacobian matrix
+calcJaco(m_curLinkPos,m_linkJaco);
+matSub(m_linkJaco,m_linkJacoLast,tmpMat67);
+factor:=1.0/(m_cycleTime);
+matMultiNum(tmpMat67,factor,JacoDot);
+m_linkJacoLast:=m_linkJaco;
+
+
+//Calculate spatial acceleration and filter it
+matMultiVec(JacoDot,m_curLinkVel,spaceAccPart1);
+matMultiVec(m_linkJaco,m_curLinkAcc,spaceAccPart2);
+vecAdd(spaceAccPart1,spaceAccPart2,m_spaceAcc);
+FOR i:=1 TO 6 BY 1 DO
+	//m_spaceAcc[i]:=m_spatialAccLpf[i].run(m_spaceAcc[i]);
+END_FOR
+
+
+//Calculate the inertial force of the operating space
+m_lambda:=i_masterDynaData.m_lambda[m_armIdx];
+matMultiVec(m_lambda,m_spaceAcc,m_spatialForce);
+matTranspose(m_linkJaco,JacoT);
+matMultiVec(JacoT,m_spatialForce,m_jntTorForAcc);		
+
+
+//taking the derivative of spatial velocity----------m_curCartLinkTwist
+matMultiVec(m_linkJaco,m_curLinkVel,m_curCartLinkTwist);
+vecSub(m_curCartLinkTwist,m_curCartLinkTwistLast,curCartLinkTwistDiff);
+vecMultiNum(curCartLinkTwistDiff,1.0/m_cycleTime,m_spaceAccByDiff);
+m_curCartLinkTwistLast:=m_curCartLinkTwist;
+FOR i:=1 TO 6 BY 1 DO
+	m_spaceAccByDiff[i]:=m_spatialAccLpf_2[i].run(m_spaceAccByDiff[i]);
+END_FOR
+
+
+//Calculate the inertial force of the operating space and convert it into joint torque
+matMultiVec(m_lambda,m_spaceAccByDiff,m_spatialForceByAccDiff);
+matMultiVec(JacoT,m_spatialForceByAccDiff,m_jntTorForAccByDiff);
+
+
+//inertia joint torque selection
+IF (m_ifAddInertia[m_armIdx]=TRUE) THEN
+	IF (m_InertiaSelect[m_armIdx]=1) THEN
+		inertiaTrqVec:=m_jntInertiaTrq;
+	ELSIF (m_InertiaSelect[m_armIdx]=2) THEN
+		inertiaTrqVec:=m_linkInertiaTrq;
+	ELSIF (m_InertiaSelect[m_armIdx]=3) THEN
+		inertiaTrqVec:=m_jntTorForAcc;
+	ELSIF (m_InertiaSelect[m_armIdx]=4) THEN
+		inertiaTrqVec:=m_jntTorForAccByDiff;
+	END_IF
+ELSE
+	inertiaTrqVec:=g_zeroVec7d;
+END_IF
+
+
+//scaling the inertia joint torque
+FOR i:=1 TO g_mJntNum BY 1 DO
+	inertiaTrq:=inertiaTrqVec[i]*m_armRatio[m_armIdx]*m_jntRatio[m_armIdx,i]; //Scale each joint
+	inertiaTrq:=inertiaTrq*m_jntVelFactor[m_armIdx,i]*m_jntAccFactor[m_armIdx,i]; //Scale based on speed and acceleration
+	o_inertiaTrq[i]:=inertiaTrq;
+END_FOR
+jntInertiaCal:=o_inertiaTrq;
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="jntVelAccCal" Id="{e5dfe905-79a5-4fa8-9681-271e30d60149}">
+      <Declaration><![CDATA[METHOD jntVelAccCal : BOOL
+VAR_INPUT
+	i_jntPos : Vec7d;
+	i_linkPos : Vec7d;
+END_VAR
+
+VAR
+	i:INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+//copy the value
+m_curJntPos:=i_jntPos;
+m_curLinkPos:=i_linkPos;
+
+FOR i:=1 TO g_mJntNum BY 1 DO
+	//calculating joint velocity
+	m_curJntVel[i]:= (m_curJntPos[i]-m_lastJntPos[i])/(m_cycleTime);
+	m_curJntVel[i] := m_jntVelLpf[i].run(m_curJntVel[i]);
+	m_lastJntPos[i] :=m_curJntPos[i];
+	
+	//calculating joint acceleration
+	m_curJntAcc[i]:=(m_curJntVel[i]-m_lastJntVel[i])/(m_cycleTime);
+	m_curJntAcc[i] := m_jntAccLpf[i].run(m_curJntAcc[i]);
+	m_lastJntVel[i]:=m_curJntVel[i];
+	
+	//calculating link velocity
+	m_curLinkVel[i] := (m_curLinkPos[i]-m_lastLinkPos[i])/(m_cycleTime);
+	m_curLinkVel[i] := m_linkVelLpf[i].run(m_curLinkVel[i]);
+	m_lastLinkPos[i] := m_curLinkPos[i];
+	
+	//calculating link acceleration
+	m_curLinkAcc[i]:=(m_curLinkVel[i]-m_lastLinkVel[i])/(m_cycleTime);
+	m_curLinkAcc[i] := m_linkAccLpf[i].run(m_curLinkAcc[i]);
+	m_lastLinkVel[i]:=m_curLinkVel[i];
+END_FOR
+
+//transform the joint 4 data
+//m_curLinkVel[4]:= m_curLinkVel[4] - m_curLinkVel[3] + m_curLinkVel[2]; 
+//m_curLinkAcc[4]:= m_curLinkAcc[4] - m_curLinkAcc[3] + m_curLinkAcc[2];
+
+//Inertia force scaling factor
+FOR i:=1 TO g_mJntNum DO
+	m_jntVelFactor[m_armIdx,i]:=LIMIT(0,ABS(m_curLinkVel[i]/(m_jntVelLimit[m_armIdx,i]*m_jntVelLimitScaler[m_armIdx])),1);
+	m_jntAccFactor[m_armIdx,i]:=LIMIT(0,ABS(m_curLinkAcc[i]/m_jntAccLimit[m_armIdx,i]*m_jntAccLimitScaler[m_armIdx]),1);
+END_FOR
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_JntInertia">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_JntInertia.calcJaco">
+      <LineId Id="126" Count="91" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_JntInertia.init">
+      <LineId Id="22" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="32" Count="6" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="43" Count="3" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_JntInertia.jntInertiaCal">
+      <LineId Id="22" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="17" Count="1" />
+      <LineId Id="10" Count="1" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="348" Count="0" />
+      <LineId Id="66" Count="2" />
+      <LineId Id="339" Count="0" />
+      <LineId Id="326" Count="0" />
+      <LineId Id="75" Count="0" />
+      <LineId Id="77" Count="5" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="84" Count="0" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="88" Count="1" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="90" Count="1" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="350" Count="0" />
+      <LineId Id="96" Count="4" />
+      <LineId Id="92" Count="2" />
+      <LineId Id="101" Count="1" />
+      <LineId Id="86" Count="0" />
+      <LineId Id="120" Count="0" />
+      <LineId Id="125" Count="1" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="141" Count="7" />
+      <LineId Id="139" Count="0" />
+      <LineId Id="149" Count="1" />
+      <LineId Id="140" Count="0" />
+      <LineId Id="130" Count="0" />
+      <LineId Id="105" Count="1" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="118" Count="0" />
+      <LineId Id="151" Count="1" />
+      <LineId Id="119" Count="0" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="175" Count="0" />
+      <LineId Id="252" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_JntInertia.jntVelAccCal">
+      <LineId Id="42" Count="0" />
+      <LineId Id="71" Count="1" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="43" Count="1" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="59" Count="1" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="63" Count="1" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="65" Count="1" />
+      <LineId Id="69" Count="1" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="73" Count="1" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="81" Count="3" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="93" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
