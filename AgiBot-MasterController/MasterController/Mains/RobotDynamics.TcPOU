@@ -25,6 +25,9 @@ VAR
 	// master external torque observer
 	m_jntDOB : ARRAY[1..g_mArmNum] OF FB_JntObserver;
 	
+	//master arm joint inertia
+	m_jntInertia : ARRAY[1..g_mArmNum] OF FB_JntInertia;
+	
 	// code execute time measure
 	m_codeTime : Profiler;
 	
@@ -43,6 +46,7 @@ IF m_robotDynaInit =FALSE THEN
 		m_frictionModel[i].init(i);
 		// NOTE: curJntPos is usually zero when init, so observer need some time to stable after code run
 		m_jntDOB[i].init(i, m_masterJointsData.m_curJntPos[i]); 
+		m_jntInertia[i].init(i);
 	END_FOR
 
 	m_robotDynaInit:=TRUE;
@@ -67,13 +71,15 @@ FOR i:=1 TO g_mArmNum DO
 	vecSelfAdd(m_masterDynaData.m_jntExtTrq[i], m_masterDynaData.m_gravity[i]);
 	vecSelfAdd(m_masterDynaData.m_jntExtTrq[i], m_masterDynaData.m_friction[i]);*)
 	
+	//joint inertia torque
+	m_masterDynaData.m_jntExtTrq[i]:=m_jntInertia[i].jntInertiaCal(m_masterJointsData.m_curJntPos[i],m_masterJointsData.m_curLinkPos[i],m_masterDynaData);
 END_FOR
 
 m_codeTime(START:=FALSE);
 ]]></ST>
     </Implementation>
     <LineIds Name="RobotDynamics">
-      <LineId Id="281" Count="36" />
+      <LineId Id="381" Count="39" />
       <LineId Id="110" Count="0" />
     </LineIds>
   </POU>

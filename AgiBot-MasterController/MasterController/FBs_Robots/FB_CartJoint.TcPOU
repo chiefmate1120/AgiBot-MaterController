@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
   <POU Name="FB_CartJoint" Id="{b7c25fb7-df7c-4023-8b4f-0e081206f704}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_CartJoint EXTENDS FB_JointBase
 VAR_INPUT
@@ -67,10 +67,13 @@ m_cmdJntTrq :=0.0;
 m_cmdCurrent := 0.0;
 
 // filter init
-m_jntVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_cartCtrlFreq);
-m_linkVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_cartCtrlFreq);
 m_cmdTrqLpf.init(1, g_cmdJntTrqLpfCutoffFreq, g_cartCtrlFreq);
 m_curTrqLpf.init(1, g_curJntTrqLpfCutoffFreq, g_cartCtrlFreq);
+m_jntVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_cartCtrlFreq);
+m_linkVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_cartCtrlFreq);
+m_jntAccLpf.init(1, g_curJntVelLpfCutoffFreq*0.2, g_armCtrlFreq); 
+m_linkAccLpf.init(1, g_curJntVelLpfCutoffFreq*0.2, g_armCtrlFreq); 
+
 
 // driver init value
 m_motorOutputs.m_controlWord:=DriverCtrlWord_INIT;
@@ -83,7 +86,7 @@ m_motorOutputs.m_cmdMotorEncoder:=m_motorInputs.m_motorEncoder;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_CartJoint.init">
-      <LineId Id="232" Count="55" />
+      <LineId Id="293" Count="58" />
       <LineId Id="39" Count="0" />
     </LineIds>
   </POU>

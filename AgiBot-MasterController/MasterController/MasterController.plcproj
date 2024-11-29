@@ -316,6 +316,9 @@
     <Compile Include="FBs_BasicControllers\FB_RedunJntControl.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="FBs_Observer\FB_JntInertia.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="FBs_Observer\FB_JntObserver.TcPOU">
       <SubType>Code</SubType>
     </Compile>

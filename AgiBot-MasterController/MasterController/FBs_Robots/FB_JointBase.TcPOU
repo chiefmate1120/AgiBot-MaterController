@@ -68,6 +68,13 @@ VAR
 	m_curTrqLpf : FB_LowPassFilter;
 	m_cmdTrqLpf :FB_LowPassFilter;
 	
+	//joint acceleration and filter
+	m_curJntAcc :LREAL;
+	m_curLinkAcc:LREAL;
+	m_lastJntVel: LREAL;
+	m_lastLinkVel: LREAL;
+	m_jntAccLpf :FB_LowPassFilter;
+	m_linkAccLpf :FB_LowPassFilter;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -368,6 +375,16 @@ m_curLinkVel := (m_curLinkPos-m_lastLinkPos)/m_cycleTime;
 m_curLinkVel := m_linkVelLpf.run(m_curLinkVel);
 m_lastLinkPos := m_curLinkPos;
 
+//compute joint acceleration
+m_curJntAcc:=(m_curJntVel-m_lastJntVel)/m_cycleTime;
+m_curJntAcc := m_jntAccLpf.run(m_curJntAcc);
+m_lastJntVel:=m_curJntVel;
+
+//compute link acceleration
+m_curLinkAcc:=(m_curLinkVel-m_lastLinkVel)/m_cycleTime;
+m_curLinkAcc := m_linkAccLpf.run(m_curLinkAcc);
+m_lastLinkVel:=m_curLinkVel;
+
 // current and torque
 m_rawCurrent := m_motorInputs.m_current;
 m_filtCurrent := m_curTrqLpf.run(m_rawCurrent);
@@ -480,18 +497,7 @@ m_curJntTrq := m_filtCurrent * m_current2TrqRatio;]]></ST>
       <LineId Id="61" Count="0" />
     </LineIds>
     <LineIds Name="FB_JointBase.updateStatus">
-      <LineId Id="18" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="16" Count="1" />
-      <LineId Id="7" Count="0" />
-      <LineId Id="6" Count="0" />
-      <LineId Id="9" Count="1" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="33" Count="0" />
-      <LineId Id="35" Count="2" />
-      <LineId Id="12" Count="0" />
-      <LineId Id="27" Count="2" />
+      <LineId Id="41" Count="27" />
       <LineId Id="26" Count="0" />
     </LineIds>
   </POU>

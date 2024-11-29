@@ -70,8 +70,11 @@ m_cmdCurrent := 0.0;
 // filter init
 m_jntVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_armCtrlFreq);
 m_linkVelLpf.init(1, g_curJntVelLpfCutoffFreq, g_armCtrlFreq);
+m_jntAccLpf.init(1, g_curJntVelLpfCutoffFreq*0.2, g_armCtrlFreq); 
+m_linkAccLpf.init(1, g_curJntVelLpfCutoffFreq*0.2, g_armCtrlFreq); 
 m_cmdTrqLpf.init(1, g_cmdJntTrqLpfCutoffFreq, g_armCtrlFreq);
 m_curTrqLpf.init(1, g_curJntTrqLpfCutoffFreq, g_armCtrlFreq);
+
 
 // driver init value
 m_motorOutputs.m_controlWord:=DriverCtrlWord_INIT;
@@ -84,22 +87,7 @@ m_motorOutputs.m_cmdMotorEncoder:=m_motorInputs.m_motorEncoder;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_ArmJoint.init">
-      <LineId Id="160" Count="0" />
-      <LineId Id="159" Count="0" />
-      <LineId Id="89" Count="28" />
-      <LineId Id="122" Count="6" />
-      <LineId Id="130" Count="1" />
-      <LineId Id="152" Count="0" />
-      <LineId Id="151" Count="0" />
-      <LineId Id="133" Count="1" />
-      <LineId Id="158" Count="0" />
-      <LineId Id="149" Count="0" />
-      <LineId Id="148" Count="0" />
-      <LineId Id="136" Count="0" />
-      <LineId Id="167" Count="0" />
-      <LineId Id="137" Count="0" />
-      <LineId Id="150" Count="0" />
-      <LineId Id="138" Count="4" />
+      <LineId Id="174" Count="58" />
       <LineId Id="39" Count="0" />
     </LineIds>
   </POU>

@@ -67,6 +67,9 @@ VAR
 	// joint position controller
 	m_jntPIDCtrl :ARRAY[1..g_mJntNum] OF FB_PID;
 	
+	//joint acceleration
+	m_curJntAcc :Vec7d;
+	m_curLinkAcc :Vec7d;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -937,7 +940,9 @@ FOR i:=1 TO g_mJntNum DO
 	m_curLinkPos[i]:=m_joints[i].linkPos;
 	m_curJntPos[i]:=m_joints[i].jntPos;
 	m_curJntVel[i]:=m_joints[i].jntVel;
-	m_curLinkVel[i] := m_joints[i].m_curLinkVel;
+	m_curLinkVel[i] := m_joints[i].m_curLinkVel;	
+	m_curJntAcc[i]:=m_joints[i].m_curJntAcc;
+	m_curLinkAcc[i]:=m_joints[i].m_curLinkAcc;	
 	m_curJntTrq[i]:=m_joints[i].jntTrq;
 	m_rawJntCurrent[i]:=m_joints[i].rawCurrent;
 	m_filtJntCurrent[i]:=m_joints[i].filtCurrent;
@@ -945,6 +950,7 @@ FOR i:=1 TO g_mJntNum DO
 END_FOR 
 m_curLinkPos[4]:=jnt4LinkToMotor(m_curLinkPos[2],m_curLinkPos[3], m_curLinkPos[4]);// q4motor=q4DH-q8+q2+90; 
 m_curLinkVel[4]:= m_curLinkVel[4] - m_curLinkVel[3] + m_curLinkVel[2]; 
+m_curLinkAcc[4]:= m_curLinkAcc[4] - m_curLinkAcc[3] + m_curLinkAcc[2];
 
 // cartesion pose
 forwardKinematic(m_curJntPos,m_curCartPose);
@@ -1132,35 +1138,7 @@ matMultiVec(m_linkJaco,m_curLinkVel,m_curCartLinkTwist);
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterArm.updateStatus">
-      <LineId Id="30" Count="1" />
-      <LineId Id="119" Count="0" />
-      <LineId Id="117" Count="0" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="118" Count="0" />
-      <LineId Id="14" Count="0" />
-      <LineId Id="26" Count="3" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="63" Count="1" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="17" Count="0" />
-      <LineId Id="126" Count="0" />
-      <LineId Id="18" Count="0" />
-      <LineId Id="80" Count="1" />
-      <LineId Id="88" Count="0" />
-      <LineId Id="12" Count="0" />
-      <LineId Id="103" Count="0" />
-      <LineId Id="128" Count="0" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="36" Count="1" />
-      <LineId Id="129" Count="0" />
-      <LineId Id="43" Count="1" />
-      <LineId Id="35" Count="0" />
-      <LineId Id="131" Count="0" />
-      <LineId Id="46" Count="0" />
-      <LineId Id="45" Count="0" />
-      <LineId Id="47" Count="0" />
-      <LineId Id="130" Count="0" />
+      <LineId Id="138" Count="39" />
       <LineId Id="110" Count="0" />
     </LineIds>
   </POU>
