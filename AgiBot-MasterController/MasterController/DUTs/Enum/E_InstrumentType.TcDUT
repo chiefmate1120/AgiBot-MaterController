@@ -18,8 +18,15 @@
 	InstruType_Endoscope := 20,
 	InstruType_UltrasoundKnifeS :=42,
 	InstruType_UltrasoundKnifeU :=43,
-	InstruType_First := InstruType_CadiereForceps,
-	InstruType_Last := InstruType_UltrasoundKnifeU
+	InstruType_TipUpFenestratedGrasper :=44,
+	InstruType_MegaNeedleDriver :=45,
+	InstruType_DeBakeyForceps :=46,
+	InstruType_BlackDiamondForceps :=47,
+	InstruType_PottsScissors :=48,
+	InstruType_CurvedBipolarDissector :=49,
+	InstruType_MicroBipolarForceps :=50,
+	InstruType_ForceBipolar :=51,
+	InstruType_MicroCauteryHook :=52
 );
 END_TYPE
 ]]></Declaration>
