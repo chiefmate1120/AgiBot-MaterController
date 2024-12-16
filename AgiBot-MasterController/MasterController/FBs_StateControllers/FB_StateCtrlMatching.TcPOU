@@ -54,7 +54,7 @@ var
 	jnt4MoveRange:LREAL;
 	jnt5Bias, jnt4MoveScale :LREAL;
 	
-	cmdJntErr:Vec7d;
+	curJntPos, curJntErr:Vec7d;
 
 END_VAR]]></Declaration>
       <Implementation>
@@ -66,13 +66,13 @@ END_VAR]]></Declaration>
 	
 	// traj plan
 	calcCmdJntPos :=m_matchTrajPlanner.evaluate(m_timePeriod, jntPos=> m_cmdJntPos, jntVel=>m_cmdJntVel, jntAcc=> m_cmdJntAcc);
-	
-	vecSub(m_targetJntPos, m_cmdJntPos, cmdJntErr);
+	curJntPos :=i_masterArm.curJntPos;
+	vecSub(m_targetJntPos, curJntPos, curJntErr);
 	
 	matTranspose(i_masterArm.curCartPose.m_rot, invRot);
 	matMultiply(invRot, m_cmdCartPose.m_rot, rotErr);
 	rot2AngAxis(rotErr, angle=>m_rotErrAng,axis=>);
-	m_isFinished := m_timePeriod > m_matchTrajPlanner.duration AND  norm(cmdJntErr)<g_jntCtrlAngTolHigh and abs(m_rotErrAng)<g_jntCtrlAngTolHigh;
+	m_isFinished := m_timePeriod > m_matchTrajPlanner.duration AND  norm(curJntErr)<g_jntCtrlAngTolHigh;
 	
 	RETURN;
 END_IF
