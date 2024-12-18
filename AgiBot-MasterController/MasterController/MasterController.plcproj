@@ -355,6 +355,9 @@
     <Compile Include="FBs_StateControllers\FB_StateCtrlDisable.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="FBs_StateControllers\FB_StateCtrlGraBiasCali.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="FBs_StateControllers\FB_StateCtrlGraCali.TcPOU">
       <SubType>Code</SubType>
     </Compile>

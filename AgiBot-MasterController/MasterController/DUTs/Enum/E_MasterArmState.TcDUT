@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <DUT Name="E_MasterArmState" Id="{1772d389-f98f-4390-a8fe-c1a65ee5f75e}">
     <Declaration><![CDATA[// Notice: Each state has a corresponding controller, which has a fixed index.
 // Add the new state at the end and update the total num
@@ -19,8 +19,9 @@ TYPE E_MasterArmState :
 	MasterArmState_Test :=12,
 	MasterArmState_Disable :=13,
 	MasterArmState_Performance :=14,
+	MasterArmState_GravityBiasCali :=15,
 	
-	MasterArmState_totalNum :=MasterArmState_Performance
+	MasterArmState_totalNum :=MasterArmState_GravityBiasCali
 );
 END_TYPE
 ]]></Declaration>

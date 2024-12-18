@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_MasterRobot" Id="{8cbdb2ba-9735-46e3-8cbc-296330acc8cc}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_MasterRobot
 VAR
@@ -57,6 +57,7 @@ VAR
 	m_armTest :ARRAY[1..g_mArmNum] OF FB_StateCtrlTest;
 	m_armDisable :ARRAY[1..g_mArmNum] OF FB_StateCtrlDisable;
 	m_armPerformance :ARRAY[1..g_mArmNum] OF FB_StateCtrlPerformance;
+	m_armGravityBiasCali :ARRAY[1..g_mArmNum] OF FB_StateCtrlGraBiasCali;	
 	
 	// specialized endoscope controller
 	m_scopeCtrl :FB_EndoscopeController;
@@ -314,6 +315,7 @@ FOR i:=1 TO g_mArmNum DO
 	m_armCtrlFactory[i,MasterArmState_Test] := m_armTest[i];
 	m_armCtrlFactory[i,MasterArmState_Disable] := m_armDisable[i];
 	m_armCtrlFactory[i,MasterArmState_Performance] := m_armPerformance[i];
+	m_armCtrlFactory[i,MasterArmState_GravityBiasCali] := m_armGravityBiasCali[i];
 
 	// assign controller
 	m_armCtrl[i]:=m_armCtrlFactory[i,m_masterArmState[i]];
@@ -490,7 +492,14 @@ FOR i:=1 TO g_mArmNum DO
 		MasterArmState_Home:
 			IF m_armCtrl[i].isFinished  THEN
 				m_armSelfCheckFinshedFlag[i] := TRUE;
+				m_nextMasterArmState[i]:=MasterArmState_GravityBiasCali;
+			END_IF
+			
+		//graivity bias calibration
+		MasterArmState_GravityBiasCali:
+			IF m_armCtrl[i].isFinished  THEN
 				m_nextMasterArmState[i]:=MasterArmState_Standby;
+				m_masterArms[i].jntGravityBias := m_armGravityBiasCali[i].m_gravityBias;
 			END_IF
 		
 		//standby
@@ -720,6 +729,7 @@ END_FOR]]></ST>
       <LineId Id="115" Count="0" />
       <LineId Id="145" Count="0" />
       <LineId Id="152" Count="0" />
+      <LineId Id="159" Count="0" />
       <LineId Id="73" Count="0" />
       <LineId Id="72" Count="0" />
       <LineId Id="12" Count="0" />
@@ -786,7 +796,13 @@ END_FOR]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterRobot.stateMachine">
-      <LineId Id="1567" Count="198" />
+      <LineId Id="1567" Count="57" />
+      <LineId Id="1780" Count="0" />
+      <LineId Id="1775" Count="2" />
+      <LineId Id="1779" Count="0" />
+      <LineId Id="1781" Count="0" />
+      <LineId Id="1774" Count="0" />
+      <LineId Id="1625" Count="140" />
       <LineId Id="225" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterRobot.updateShoulderPose">

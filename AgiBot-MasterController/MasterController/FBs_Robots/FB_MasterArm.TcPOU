@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <POU Name="FB_MasterArm" Id="{623926f8-06e2-46b6-bb1f-baa6bc16e9cb}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_MasterArm
 VAR
@@ -54,6 +54,7 @@ VAR
 	m_dynaNullspace :Mat7d;
 	m_jntFriction :Vec7d;
 	m_jntExtTrq :Vec7d;
+	m_jntGravityBias :Vec7d;
 	
 	// arm jacobian 
 	m_jaco : Mat67;
@@ -511,6 +512,7 @@ END_VAR]]></Declaration>
 m_armIdx:=i_armIdx;
 m_gripAngle:=0;
 m_gripAngleCalc.init(m_armIdx);
+m_jntGravityBias :=g_zeroVec7d;
 
 // joint init
 FOR i:=1 TO g_mJntNum DO
@@ -796,6 +798,26 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
+    <Property Name="jntGravityBias" Id="{98e9447b-dbcb-43f9-9939-c5f9658d66f6}" FolderPath="property\">
+      <Declaration><![CDATA[PROPERTY jntGravityBias :REFERENCE to Vec7d]]></Declaration>
+      <Get Name="Get" Id="{45c5ec0b-01e0-48e0-8f64-7a1d89f2d1fe}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[jntGravityBias ref=m_jntGravityBias;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{4abadf39-71db-4fe9-89b5-4fa9c3a50b80}">
+        <Declaration><![CDATA[PUBLIC 
+VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[m_jntGravityBias := jntGravityBias;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Property Name="massMat" Id="{c4fbf6a1-1d71-4f80-9bfa-395c19261a6f}" FolderPath="property\">
       <Declaration><![CDATA[PROPERTY PUBLIC massMat :REFERENCE to Mat7d]]></Declaration>
       <Get Name="Get" Id="{b8079ba8-3835-474b-9d8e-6afd86dc6a9b}">
@@ -874,7 +896,7 @@ FOR i:=1 TO g_mJntNum DO
 	ELSIF i_armCtrlCmd.m_jntOPMode[i]=DriverOPMode_Trq THEN
 		// gravity feedforward
 		m_jntPIDCtrl[i].reset();
-		m_cmdJntTrq[i]:=m_cmdJntTrq[i]+m_jntGravity[i];
+		m_cmdJntTrq[i]:=m_cmdJntTrq[i]+m_jntGravity[i] + m_jntGravityBias[i];
 		m_joints[i].updateCmds(DriverOPMode_Trq,i_armCtrlCmd.m_cmdJntPos[i],m_cmdJntTrq[i]);
 	ELSE
 		m_jntPIDCtrl[i].reset();
@@ -1055,6 +1077,7 @@ matMultiVec(m_linkJaco,m_curLinkVel,m_curCartLinkTwist);
       <LineId Id="54" Count="0" />
       <LineId Id="35" Count="0" />
       <LineId Id="101" Count="0" />
+      <LineId Id="109" Count="0" />
       <LineId Id="72" Count="0" />
       <LineId Id="68" Count="0" />
       <LineId Id="5" Count="0" />
@@ -1108,6 +1131,12 @@ matMultiVec(m_linkJaco,m_curLinkVel,m_curCartLinkTwist);
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterArm.jntGravity.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MasterArm.jntGravityBias.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MasterArm.jntGravityBias.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_MasterArm.massMat.Get">
