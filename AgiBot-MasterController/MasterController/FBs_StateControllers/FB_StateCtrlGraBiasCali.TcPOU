@@ -1,0 +1,230 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="FB_StateCtrlGraBiasCali" Id="{1f173d86-5096-45f3-bc75-6058429a56c7}" SpecialFunc="None">
+    <Declaration><![CDATA[// Brief: Master Arm Home Posture
+FUNCTION_BLOCK PUBLIC FB_StateCtrlGraBiasCali EXTENDS FB_MasterArmCtrlBase
+VAR CONSTANT
+	m_caliAng :LREAL :=10*g_deg2Rad;
+	m_caliAng2 :LREAL :=20*g_deg2Rad;
+	m_dataPoolLength : INT := 2500;	
+END_VAR
+VAR
+	m_caliTrajPlanner:ARRAY[1..2] OF FB_TrajMoveJ;
+	
+	// home motion parameters
+	m_caliMotionRange:ARRAY [1..2] OF Vec7d :=[[-m_caliAng, -m_caliAng, m_caliAng, m_caliAng2, -m_caliAng2, m_caliAng2, m_caliAng2],
+							 			  		[m_caliAng, -m_caliAng, m_caliAng, m_caliAng2, m_caliAng2, -m_caliAng2, -m_caliAng2]];
+	m_maxjntVel:Vec7d:=[3(2.5*g_deg2rad),4(5*g_deg2rad)];
+	m_maxjntAcc:Vec7d:=[7(1.0)];
+	m_maxjntJerk:Vec7d:=[7(2.0)];
+	
+	// cali traj index
+	m_caliTrajIdx :INT :=1;
+	
+	// sample intervals
+	m_sampleIntervals :INT :=10;
+	m_sampleTimeCounts :INT :=1;
+	
+	// sample data pool
+	m_dataPool :ARRAY[1..2, 1..m_dataPoolLength] OF Vec7d;
+	m_dataPoolIdx :ARRAY[1..2] OF INT :=[1,1];
+	m_gravityDataPool :ARRAY[1..2, 1..m_dataPoolLength] OF Vec7d;
+	
+	m_gravityBias :Vec7d;
+	m_validDataNum:INT;
+	m_transitDataNum :INT :=200;
+	m_gravityMaxBias :Vec7d := [7(0.025)];
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="calcBias" Id="{835af2cb-b19b-49b6-a778-71f3c427d379}">
+      <Declaration><![CDATA[METHOD PROTECTED calcBias : BOOL
+VAR
+	i:INT;
+	actGravity, modelGravity, offset:Vec7d;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[m_validDataNum := MIN(m_dataPoolIdx[1], m_dataPoolIdx[2]);
+m_gravityBias := g_zeroVec7d;
+
+FOR i:= m_transitDataNum+1 TO m_validDataNum-m_transitDataNum DO 
+	vecAdd( m_dataPool[1,i], m_dataPool[2, m_validDataNum-i+1], actGravity);
+	vecSelfMultiNum(actGravity, 0.5);
+	vecAdd( m_gravityDataPool[1,i], m_gravityDataPool[2, m_validDataNum-i+1], modelGravity);
+	vecSelfMultiNum(modelGravity, 0.5);
+	vecSub(actGravity, modelGravity, offset);
+	vecSelfAdd( m_gravityBias, offset);
+END_FOR
+
+vecSelfMultiNum(m_gravityBias, 1.0/(m_validDataNum-2*m_transitDataNum));
+
+FOR i:=1 TO 7 DO 
+	m_gravityBias[i] := LIMIT(-m_gravityMaxBias[i], m_gravityBias[i], m_gravityMaxBias[i]);
+END_FOR]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="calcCmdJntPos" Id="{b6aa1860-a8f0-4bb7-93ee-ae2a148362df}">
+      <Declaration><![CDATA[// override this function in each exact controller
+METHOD PROTECTED calcCmdJntPos : BOOL
+VAR_IN_OUT CONSTANT
+	i_slaveIdx :INT;
+	i_shoulderPose :ST_Frame;
+	i_masterArm :FB_MasterArm;
+	i_slaveStatus :ST_SlaveStatus;
+END_VAR
+VAR 
+	i :INT;
+	curJntVel :Vec7d;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF m_isFinished THEN
+	RETURN;
+END_IF
+
+// check if planner is ready
+IF m_caliTrajPlanner[1].isGene = FALSE OR m_caliTrajPlanner[2].isGene = FALSE THEN
+	m_timePeriod :=0;
+	calcCmdJntPos:=FALSE;
+	RETURN;
+END_IF
+
+// traj plan
+calcCmdJntPos :=m_caliTrajPlanner[m_caliTrajIdx].evaluate(m_timePeriod, jntPos=> m_cmdJntPos, jntVel=>m_cmdJntVel, jntAcc=> m_cmdJntAcc);
+
+// sample data
+IF m_sampleTimeCounts =1 AND m_dataPoolIdx[m_caliTrajIdx] <=m_dataPoolLength THEN
+	m_dataPool[m_caliTrajIdx, m_dataPoolIdx[m_caliTrajIdx]] := i_masterArm.curJntTrq;
+	m_gravityDataPool[m_caliTrajIdx, m_dataPoolIdx[m_caliTrajIdx]] := i_masterArm.jntGravity;
+	m_dataPoolIdx[m_caliTrajIdx]:= m_dataPoolIdx[m_caliTrajIdx] + 1;
+END_IF 
+m_sampleTimeCounts:=m_sampleTimeCounts+1;
+IF m_sampleTimeCounts > m_sampleIntervals THEN
+	m_sampleTimeCounts :=1;
+END_IF
+
+
+// check if to next segment or terminate
+curJntVel :=i_masterArm.curJntVel;
+IF (m_timePeriod > m_caliTrajPlanner[m_caliTrajIdx].duration  AND norm(curJntVel)<7*g_jntStaticVelThres) THEN
+	m_caliTrajIdx := m_caliTrajIdx +1;
+	m_timePeriod :=0;
+END_IF
+
+m_isFinished := m_caliTrajIdx >2;
+
+IF m_isFinished THEN
+	calcBias();
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="init" Id="{29ee3024-19ff-4b7a-90c8-01e08c0c6298}">
+      <Declaration><![CDATA[METHOD PUBLIC init : BOOL
+VAR_IN_OUT CONSTANT
+	i_masterArm	:FB_MasterArm;
+END_VAR
+VAR_IN_OUT 
+	r_masterArmCtrlCmd :ST_ArmCtrlCmds;
+END_VAR
+
+VAR
+	i,j :INT;
+	startJntPos,endJntPos :Vec7d;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.Init(i_masterArm,r_masterArmCtrlCmd);
+
+// traj plan
+startJntPos:=i_masterArm.curJntPos;
+vecAdd(startJntPos, m_caliMotionRange[i_masterArm.armIdx], endJntPos);
+m_caliTrajPlanner[1].init(startJntPos,endJntPos,m_maxjntVel,m_maxjntAcc,m_maxjntJerk);
+
+startJntPos := endJntPos;
+endJntPos:=i_masterArm.curJntPos;
+m_caliTrajPlanner[2].init(startJntPos,endJntPos,m_maxjntVel,m_maxjntAcc,m_maxjntJerk);
+
+m_caliTrajIdx :=1;
+m_dataPoolIdx[1]:=1;
+m_dataPoolIdx[2]:=1;
+m_gravityBias:=g_zeroVec7d;
+
+
+// update commands to arm
+copyCmds(r_masterArmCtrlCmd);]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_StateCtrlGraBiasCali">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_StateCtrlGraBiasCali.calcBias">
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="6" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="23" Count="1" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="31" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_StateCtrlGraBiasCali.calcCmdJntPos">
+      <LineId Id="82" Count="0" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="84" Count="0" />
+      <LineId Id="86" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="79" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="39" Count="1" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="104" Count="0" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="118" Count="3" />
+      <LineId Id="92" Count="0" />
+      <LineId Id="95" Count="4" />
+      <LineId Id="117" Count="0" />
+      <LineId Id="100" Count="1" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="122" Count="0" />
+      <LineId Id="124" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_StateCtrlGraBiasCali.init">
+      <LineId Id="57" Count="0" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="152" Count="0" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="133" Count="0" />
+      <LineId Id="129" Count="1" />
+      <LineId Id="128" Count="0" />
+      <LineId Id="135" Count="0" />
+      <LineId Id="134" Count="0" />
+      <LineId Id="136" Count="0" />
+      <LineId Id="139" Count="0" />
+      <LineId Id="153" Count="0" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="113" Count="1" />
+      <LineId Id="112" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
